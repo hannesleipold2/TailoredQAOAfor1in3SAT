@@ -1,0 +1,1 @@
+# TailoredQAOAfor1in3SAT
