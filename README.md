@@ -4,7 +4,7 @@
 
 This Hackathon is work for a future publication based in part on the results gathered here. Our project is about benchmarking an exciting tailored Quantum Alternating Operator Ansatz (`QAOA`) approach for solving `1-in-3 SAT`. 
 
-Given the promising recent results obtained with the Quantum Approximate Optimization Algorithm (`QAOA1`) by [Boulebnane and Montanaro](https://arxiv.org/abs/2208.06909)[[1]] showing quantum advantage, we wish to understand what computational benefit tailored QAOA can bring on Boolean Satisfiability problems. 
+Given the promising recent results obtained with the Quantum Approximate Optimization Algorithm (`QAOA1`) by [Boulebnane and Montanaro](https://arxiv.org/abs/2208.06909)[[1]](#1) showing quantum advantage, we wish to understand what computational benefit tailored QAOA can bring on Boolean Satisfiability problems. 
 
 We plan to generate a collection of `1-in-3 SAT` instances of increasing sizes in the phase transition (see below for more details), following the example set by their paper. 
 
