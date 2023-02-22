@@ -1,5 +1,7 @@
 # Increasing Quantum Advantage with Tailored QAOA for 1-in-3 SAT
 
+This documentation is a work-in-progress during the Hackathon.
+
 ## Project Overview 
 
 This Hackathon is work for a future publication based in part on the results gathered here. Our project is about benchmarking an exciting tailored Quantum Alternating Operator Ansatz (`QAOA`)[[1]](#1) approach for solving `1-in-3 SAT`. 
@@ -17,7 +19,11 @@ We also use a brute-force solver to find the entire solution space and generate 
 
 # Quantum Approximate Optimization Algorithm for 1-in-3 SAT
 
+Here we describe `QAOA1` at a high level.
 
+```math
+    U_{p}(\alpha, \beta) = U_{d}(\beta_{p}) U_{c}(\alpha_{p}) \,  \ldots \, U_{d}(\beta_1) \, U_{c}(\alpha_1)
+```
 
 # Tailored Quantum Alternating Operator Ansatz for 1-in-3 SAT
 
