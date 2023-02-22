@@ -1,4 +1,4 @@
-# TailoredQAOAfor1in3SAT
+# Increasing Quantum Advantage with Tailored QAOA for 1-in-3 SAT
 
 ## Project Overview 
 
@@ -30,7 +30,7 @@ Given a collection of `m` clauses, each with $3$ literals, we wish to find an as
 
 ## Random 1-in-3 SAT instances in Phase Transition
 
-The [transition](https://www.researchgate.net/publication/2400280_The_phase_transition_in_1-in-k_SAT_and_NAE_3-SAT) [[3]](#3) from likely to be satisfiable to likely to be unsatisfiable for random `1-n-k` SAT problems occurs with $n/{k \choose 2}$ clauses. For random  `1-in-3` SAT, this occurs with `n/3` clauses. 
+The [transition](https://www.researchgate.net/publication/2400280_The_phase_transition_in_1-in-k_SAT_and_NAE_3-SAT) [[3]](#3) from likely to be satisfiable to likely to be unsatisfiable for random `1-in-k` SAT problems occurs with $n/{k \choose 2}$ clauses. For random  `1-in-3` SAT, this occurs with `n/3` clauses. 
 
 ## Benchmarking
 
