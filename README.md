@@ -9,7 +9,7 @@ Given the promising recent results obtained with the Quantum Approximate Optimiz
 `QAOA` can show massive reductions in the search space considered by quantum devices in place of `QAOA1` by tailoring the mixing and phase-separating operators to smaller subspace. This includes **superpolynomial** reductions in the resulting search space. (current focus for day one, generate instances and benchmark space reduction)
 
 
-We plan to generate a collection of `1-in-3 SAT` instances of increasing sizes in the phase transition (see below for more details), following the example set by their paper. 
+We plan to generate a collection of `1-in-3 SAT` instances of increasing sizes in the phase transition (see below for more details), following the example set by their paper. While they considered `k-SAT` problems, we will see that our approach has a more meaningful impact for `1-in-3 SAT` style problems. 
 
 Primarily, we will train our `QAOA` and `QAOA1` on instances of size `12` within the band of angles prescribed by `B&M` and utilize this to solve instances of increasing size up to `20`. We will implement `CPU` and `CUDA` `GPU` functions in `Julia` to accomplish this task. 
 
