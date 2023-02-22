@@ -6,7 +6,7 @@ This Hackathon is work for a future publication based in part on the results gat
 
 Given the promising recent results obtained with the Quantum Approximate Optimization Algorithm (`QAOA1`)[[2]](#2) by [Boulebnane and Montanaro](https://arxiv.org/abs/2208.06909)[[3]](#3) showing quantum advantage, we wish to understand what computational benefit tailored QAOA can bring on Boolean Satisfiability problems. 
 
-`QAOA` can show massive reductions in the search space considered by quantum devices in place of `QAOA1` by tailoring the mixing and phase-separating operators to smaller subspace. This includes **superpolynomial** reductions in the resulting search space. (current focus for day one, generate instances and benchmark space reduction)
+`QAOA` can show massive reductions in the search space considered by quantum devices in place of `QAOA1` by tailoring the mixing and phase-separating operators to smaller subspace[[1]](#1)[[4]](#4). This includes **superpolynomial** reductions in the resulting search space. (current focus for day one, generate instances and benchmark space reduction)
 
 
 We plan to generate a collection of `1-in-3 SAT` instances of increasing sizes in the phase transition (see below for more details), following the example set by their paper. While they considered `k-SAT` problems, we will see that our approach has a more meaningful impact for `1-in-3 SAT` style problems. 
@@ -31,7 +31,7 @@ Given a collection of `m` clauses, each with $3$ literals, we wish to find an as
 
 ## Random 1-in-3 SAT instances in Phase Transition
 
-The [transition](https://www.researchgate.net/publication/2400280_The_phase_transition_in_1-in-k_SAT_and_NAE_3-SAT) [[4]](#4) from likely to be satisfiable to likely to be unsatisfiable for random `1-in-k` SAT problems occurs with $n/{k \choose 2}$ clauses. For random  `1-in-3` SAT, this occurs with `n/3` clauses. 
+The [transition](https://www.researchgate.net/publication/2400280_The_phase_transition_in_1-in-k_SAT_and_NAE_3-SAT) [[5]](#5) from likely to be satisfiable to likely to be unsatisfiable for random `1-in-k` SAT problems occurs with $n/{k \choose 2}$ clauses. For random  `1-in-3` SAT, this occurs with `n/3` clauses. 
 
 ## Benchmarking
 
@@ -40,9 +40,20 @@ The [transition](https://www.researchgate.net/publication/2400280_The_phase_tran
 ## References
 
 <a id="1">[1]</a> 
+Hadfield, S., Wang, Z., O’gorman, B., Rieffel, E. G., Venturelli, D., & Biswas, R. (2019). 
+From the quantum approximate optimization algorithm to a quantum alternating operator ansatz. Algorithms, 12(2), 34.
+
+<a id="1">[2]</a> 
+Farhi, E., Goldstone, J., & Gutmann, S. (2014). 
+A quantum approximate optimization algorithm. arXiv preprint arXiv:1411.4028.
+
+<a id="1">[3]</a> 
+Leipold, H., Spedalieri, F. M., & Rieffel, E. (2022). Tailored Quantum Alternating Operator Ansätzes for Circuit Fault Diagnostics. Algorithms, 15(10), 356.
+
+<a id="1">[4]</a> 
 Boulebnane, S., & Montanaro, A. (2022). 
 Solving boolean satisfiability problems with the quantum approximate optimization algorithm. arXiv preprint arXiv:2208.06909.
 
-<a id="3">[3]</a> 
+<a id="3">[5]</a> 
 Achlioptas, D., Chtcherba, A., Istrate, G., & Moore, C. (2001, January). 
 The phase transition in 1-in-k SAT and NAE 3-SAT. In Proceedings of the twelfth annual ACM-SIAM symposium on Discrete algorithms (pp. 721-722).
