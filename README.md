@@ -19,7 +19,7 @@ We also use a brute-force solver to find the entire solution space and generate 
 
 # Quantum Approximate Optimization Algorithm for 1-in-3 SAT
 
-Here we describe `QAOA1` at a high level. Let $\sigma^{0} =(1/2)(Id + \sigma^{z})$ and $\sigma^{1} = (1/2)(Id - \sigma^{z})$
+Here we describe `QAOA1` at a high level. Let $\sigma^{0} =(1/2)(Id + \sigma^{z})$, $\sigma^{1} = (1/2)(Id - \sigma^{z})$, and $ \alpha, \beta \in \[ 0, 2\,pi \]^{p} $
 
 ```math
     U_{p}(\alpha, \beta) = U_{\text{mixer}}(\beta_{p}) U_{\text{cost}}(\alpha_{p}) \,  \ldots \, U_{\text{mixer}}(\beta_1) \, U_{\text{cost}}(\alpha_1) .
@@ -32,12 +32,12 @@ The cost of a clause is given by satisfying one literal and unsatisfying the oth
 
 Then the phase-separating operator, given a specific $\alpha_{l}$, is just:
 ```math
-    U_{\text{cost}}(\alpha_{k}) = \prod_{\text{clause} \in \text{cost}} e^{i \, \alpha_{l} \, H_{\text{clause}} }
+    U_{\text{cost}}(\alpha_{l}) = \prod_{\text{clause} \in \text{cost}} e^{i \, \alpha_{l} \, H_{\text{clause}} }
 ```
 
 For the mixing operator, we have the typical `X` rotations per qubit for $\beta_{l}$:
 ```math
-    U_{\text{mixer}}(\beta_{k}) = \prod_{j=1}^{n} e^{-i \, \beta_{l} \, \sigma_{j}^{x}}.
+    U_{\text{mixer}}(\beta_{l}) = \prod_{j=1}^{n} e^{-i \, \beta_{l} \, \sigma_{j}^{x}}.
 ```
 
 Notice we place the negative sign for the exponent of the mixing operator and the positive sign for the exponent of the phase-separating operator. 
