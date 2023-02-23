@@ -19,7 +19,7 @@ We also use a brute-force solver to find the entire solution space and generate 
 
 # Quantum Approximate Optimization Algorithm for 1-in-3 SAT
 
-Here we describe `QAOA1` at a high level. Let $\sigma^{0} =(1/2)(Id + \sigma^{z})$, $\sigma^{1} = (1/2)(Id - \sigma^{z})$, and $\alpha, \beta \in \[ 0, 2\,pi \]^{p}$. Then:
+Here we describe `QAOA1` at a high level. Let $\sigma^{0} =(1/2)(Id + \sigma^{z})$, $\sigma^{1} = (1/2)(Id - \sigma^{z})$, and $\alpha, \beta \in \[ 0, 2 \, \pi \]^{p}$. Then:
 
 ```math
     U_{p}(\alpha, \beta) = U_{\text{mixer}}(\beta_{p}) U_{\text{cost}}(\alpha_{p}) \,  \ldots \, U_{\text{mixer}}(\beta_1) \, U_{\text{cost}}(\alpha_1) .
