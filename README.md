@@ -19,7 +19,7 @@ We also use a brute-force solver to find the entire solution space and generate 
 
 # Quantum Approximate Optimization Algorithm for 1-in-3 SAT
 
-Here we describe `QAOA1` at a high level. Let $ \sigma^{0} = \sigma^{z} + Id $ and $ \sigma^{1} = \sigma^{z} + Id $
+Here we describe `QAOA1` at a high level. Let $\sigma^{0} =(1/2)(Id + \sigma^{z})$ and $\sigma^{1} = (1/2)(Id - \sigma^{z})$
 
 ```math
     U_{p}(\alpha, \beta) = U_{\text{mixer}}(\beta_{p}) U_{\text{cost}}(\alpha_{p}) \,  \ldots \, U_{\text{mixer}}(\beta_1) \, U_{\text{cost}}(\alpha_1)
@@ -27,7 +27,7 @@ Here we describe `QAOA1` at a high level. Let $ \sigma^{0} = \sigma^{z} + Id $ a
 
 The cost of a clause is given by satisfying one and unsatisfying the others:
 ```math
-    H_{\text{clause}} = \sum_{ (e_{1}, ..., e_{k} ; v_{1}, ..., v_{k} ) = \text{clause} } \sum_{i=1}^{k} \sigma_{v_{i}}^{e_{i}} \prod_{k\neq i} \sigma_{v_{k}}^{1 - 2 \, e_{k}} 
+    H_{\text{clause}} = \sum_{ (e_{1}, ..., e_{k} ; v_{1}, ..., v_{k} ) } \sum_{i=1}^{k} \sigma_{v_{i}}^{e_{i}} \prod_{k\neq i} \sigma_{v_{k}}^{1 - 2 \, e_{k}} 
 ```
 
 Then the phase-separating operator, given a specific $ \alpha $, is just:
