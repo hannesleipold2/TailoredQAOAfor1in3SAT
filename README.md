@@ -22,12 +22,12 @@ We also use a brute-force solver to find the entire solution space and generate 
 Here we describe `QAOA1` at a high level. Let $\sigma^{0} =(1/2)(Id + \sigma^{z})$ and $\sigma^{1} = (1/2)(Id - \sigma^{z})$
 
 ```math
-    U_{p}(\alpha, \beta) = U_{\text{mixer}}(\beta_{p}) U_{\text{cost}}(\alpha_{p}) \,  \ldots \, U_{\text{mixer}}(\beta_1) \, U_{\text{cost}}(\alpha_1)
+    U_{p}(\alpha, \beta) = U_{\text{mixer}}(\beta_{p}) U_{\text{cost}}(\alpha_{p}) \,  \ldots \, U_{\text{mixer}}(\beta_1) \, U_{\text{cost}}(\alpha_1) .
 ```
 
-The cost of a clause is given by satisfying one and unsatisfying the others:
+The cost of a clause is given by satisfying one literal and unsatisfying the other literals for `1-in-k SAT`:
 ```math
-    H_{\text{clause}} = \sum_{ (e_{1}, ..., e_{k} ; v_{1}, ..., v_{k} ) } \sum_{i=1}^{k} \sigma_{v_{i}}^{e_{i}} \prod_{k\neq i} \sigma_{v_{k}}^{1 - 2 \, e_{k}} 
+    H_{\text{clause}} = \sum_{ (e_{1}, ..., e_{k} ; v_{1}, ..., v_{k} ) } \sum_{i=1}^{k} \sigma_{v_{i}}^{e_{i}} \prod_{k\neq i} \sigma_{v_{k}}^{1 - e_{k}} . 
 ```
 
 Then the phase-separating operator, given a specific $ \alpha $, is just:
