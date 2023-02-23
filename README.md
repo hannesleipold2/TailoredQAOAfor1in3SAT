@@ -30,14 +30,14 @@ The cost of a clause is given by satisfying one literal and unsatisfying the oth
     H_{\text{clause}} = \sum_{ (e_{1}, ..., e_{k} ; v_{1}, ..., v_{k} ) } \sum_{i=1}^{k} \sigma_{v_{i}}^{e_{i}} \prod_{k\neq i} \sigma_{v_{k}}^{1 - e_{k}} . 
 ```
 
-Then the phase-separating operator, given a specific $ \alpha $, is just:
+Then the phase-separating operator, given a specific $\alpha_{l}$, is just:
 ```math
-    U_{\text{cost}}(\alpha_{k}) = \prod_{\text{clause} \in \text{cost}} e^{i \, \alpha_{k} \, H_{\text{clause}} }
+    U_{\text{cost}}(\alpha_{k}) = \prod_{\text{clause} \in \text{cost}} e^{i \, \alpha_{l} \, H_{\text{clause}} }
 ```
 
-For the mixing operator, we have the typical `X` rotations per qubit for $ \beta $:
+For the mixing operator, we have the typical `X` rotations per qubit for $\beta_{l}$:
 ```math
-    U_{\text{mixer}}(\beta_{k}) = \prod_{j=1}^{n} e^{-i \, \beta_{k} \, \sigma_{j}^{x}}.
+    U_{\text{mixer}}(\beta_{k}) = \prod_{j=1}^{n} e^{-i \, \beta_{l} \, \sigma_{j}^{x}}.
 ```
 
 Notice we place the negative sign for the exponent of the mixing operator and the positive sign for the exponent of the phase-separating operator. 
