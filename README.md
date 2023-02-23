@@ -32,12 +32,12 @@ The cost of a clause is given by satisfying one literal and unsatisfying the oth
 
 Then the phase-separating operator, given a specific $ \alpha $, is just:
 ```math
-    U_{\text{cost}} = \prod_{\text{clause} \in \text{cost}} e^{i \, \alpha \, H_{\text{clause}} }
+    U_{\text{cost}}(\alpha_{k}) = \prod_{\text{clause} \in \text{cost}} e^{i \, \alpha_{k} \, H_{\text{clause}} }
 ```
 
 For the mixing operator, we have the typical `X` rotations per qubit for $ \beta $:
 ```math
-    U_{\text{mixer}}(\beta) = \prod_{j=1}^{n} e^{-i \, \beta \, \sigma_{j}^{x}}.
+    U_{\text{mixer}}(\beta_{k}) = \prod_{j=1}^{n} e^{-i \, \beta_{k} \, \sigma_{j}^{x}}.
 ```
 
 Notice we place the negative sign for the exponent of the mixing operator and the positive sign for the exponent of the phase-separating operator. 
