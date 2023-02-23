@@ -8,7 +8,7 @@ This Hackathon is work for a future publication based in part on the results gat
 
 Given the promising recent results obtained with the Quantum Approximate Optimization Algorithm (`QAOA1`)[[2]](#2) by [Boulebnane and Montanaro](https://arxiv.org/abs/2208.06909)[[3]](#3) showing quantum advantage, we wish to understand what computational benefit tailored QAOA can bring on Boolean Satisfiability problems. 
 
-`QAOA` can show massive reductions in the search space considered by quantum devices in place of `QAOA1` by tailoring the mixing and phase-separating operators to smaller subspace[[1]](#1)[[4]](#4). This includes **superpolynomial** reductions in the resulting search space. (current focus for day one, generate instances and benchmark space reduction)
+`QAOA` can show massive reductions in the search space considered by quantum devices in place of `QAOA1` by tailoring the mixing and phase-separating operators to smaller subspace[[1]](#1)[[4]](#4). This includes **superpolynomial** reductions in the resulting search space and such a reduction will be seen here as well. (current focus for day one, generate instances and benchmark space reduction)
 
 
 We plan to generate a collection of `1-in-3 SAT` instances of increasing sizes in the phase transition (see below for more details), following the example set by their paper. While they considered `k-SAT` problems, we will see that our approach has a more meaningful impact for `1-in-3 SAT` style problems. 
@@ -19,15 +19,33 @@ We also use a brute-force solver to find the entire solution space and generate 
 
 # Quantum Approximate Optimization Algorithm for 1-in-3 SAT
 
-Here we describe `QAOA1` at a high level.
+Here we describe `QAOA1` at a high level. Let $ \sigma^{0} = \sigma^{z} + Id $ and $ \sigma^{1} = \sigma^{z} + Id $
 
 ```math
-    U_{p}(\alpha, \beta) = U_{d}(\beta_{p}) U_{c}(\alpha_{p}) \,  \ldots \, U_{d}(\beta_1) \, U_{c}(\alpha_1)
+    U_{p}(\alpha, \beta) = U_{\text{mixer}}(\beta_{p}) U_{\text{cost}}(\alpha_{p}) \,  \ldots \, U_{\text{mixer}}(\beta_1) \, U_{\text{cost}}(\alpha_1)
 ```
+
+The cost of a clause is given by satisfying one and unsatisfying the others:
+```math
+    H_{\text{clause}} = \sum_{ (e_{1}, ..., e_{k} ; v_{1}, ..., v_{k} ) = \text{clause} } \sum_{i=1}^{k} \sigma_{v_{i}}^{e_{i}} \prod_{k\neq i} \sigma_{v_{k}}^{1 - 2 \, e_{k}} 
+```
+
+Then the phase-separating operator, given a specific $ \alpha $, is just:
+```math
+    U_{\text{cost}} = \prod_{\text{clause} \in \text{cost}} e^{i \, \alpha \, H_{\text{clause}} }
+```
+
+For the mixing operator, we have the typical `X` rotations per qubit for $ \beta $:
+```math
+    U_{\text{mixer}}(\beta) = \prod_{j=1}^{n} e^{-i \, \beta \, \sigma_{j}^{x}}.
+```
+
+Notice we place the negative sign for the exponent of the mixing operator and the positive sign for the exponent of the phase-separating operator. 
 
 # Tailored Quantum Alternating Operator Ansatz for 1-in-3 SAT
 
 Here we describe our approach at a high level. 
+
 
 
 # 1-in-3 SAT 
@@ -39,7 +57,7 @@ Given a collection of `m` clauses, each with $3$ literals, we wish to find an as
 
 The [transition](https://www.researchgate.net/publication/2400280_The_phase_transition_in_1-in-k_SAT_and_NAE_3-SAT) [[5]](#5) from likely to be satisfiable to likely to be unsatisfiable for random `1-in-k` SAT problems occurs with $n/{k \choose 2}$ clauses. For random  `1-in-3` SAT, this occurs with `n/3` clauses. 
 
-## Benchmarking
+# Benchmarking
 
 
 
