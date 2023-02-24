@@ -2,6 +2,8 @@
 
 This documentation is a work-in-progress during the Hackathon.
 
+
+
 ## Project Overview 
 
 This Hackathon is work for a future publication based in part on the results gathered here. Our project is about benchmarking an exciting tailored Quantum Alternating Operator Ansatz (`QAOA`)[[1]](#1) approach for solving `1-in-3 SAT`. 
@@ -49,7 +51,7 @@ The initial wavefunction is:
 
 And so the final wavefunction is:
 ```math
-\ket{\phi(p)} = U(\alpha, \beta) \ket{\phi(0)}
+\ket{\phi(p)} = U_{p}(\alpha, \beta) \ket{\phi(0)}
 ```
 
 
