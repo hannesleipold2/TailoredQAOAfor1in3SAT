@@ -12,20 +12,12 @@ import Unmarshal
 
 include("bitvec_conversions.jl")
 include("sat_generator.jl")
+include("measures_n_reps.jl")
 
 using .SatGenerator
 #=
 	# This file is always evolving, title is misleading
 =#
-
-
-function calc_sol_support(sol_vecs::Array{Array{Complex{Float64},1},1}, wave_func::Array{Complex{Float64},1})
-	sol_support = 0.0
-	for i = 1 : length(sol_vecs)
-		sol_support += abs(dot(sol_vecs[ i ], wave_func / norm(wave_func))) ^ 2
-	end
-	return sol_support
-end
 
 
 function make_costop_vec(sat_prob::SatProblem)
@@ -87,8 +79,7 @@ function phase_energy(wave_func, costop_vec, alpha)
 		println("unmatch cost and wave funcs ", length(wave_func), " ", length(costop_vec))
 		breakhere!()
 	end
-	phase_vec = [ exp(1.0im * alpha * costop_vec[i]) for i = 1 : length(costop_vec) ]
-	return [ phase_vec[i] * wave_func[i] for i = 1 : length(costop_vec) ]
+	return [ exp(1.0im * alpha * costop_vec[i]) * wave_func[i] for i = 1 : length(costop_vec) ]
 end
 
 function apply_xmixer(wave_func, num_bits, beta)
@@ -113,9 +104,10 @@ function apply_xmixer(wave_func, num_bits, beta)
 end
 
 function run_single_inst(sat_prob::SatProblem)
-	p_rounds    = 10
-	alphas      = [ pi * (p/p_rounds)       for p = 1 : p_rounds ]
-	betas       = [ pi * (1 - (p/p_rounds)) for p = 1 : p_rounds ]
+	p_rounds    = 50
+	pi_co		= pi / 5
+	alphas      = [ pi_co * (p/p_rounds)       for p = 1 : p_rounds ]
+	betas       = [ pi_co * (1 - (p/p_rounds)) for p = 1 : p_rounds ]
 	println(alphas)
 	println(betas)
 
@@ -127,7 +119,7 @@ function run_single_inst(sat_prob::SatProblem)
 	red_sols = sat_prob.red_solutions
 	sol_vecs = Array{Array{Complex{Float64}, 1}, 1}()
 	for i = 1 : length(red_sols)
-		sol_vec 	= zeros(Complex{Float64}, num_states)
+		sol_vec = zeros(Complex{Float64}, num_states)
 		sol_vec[ bit_vec_to_int(red_sols[ i ]) ] = Float64(1)
 		push!(sol_vecs, sol_vec)
 	end	
@@ -140,6 +132,8 @@ function run_single_inst(sat_prob::SatProblem)
 	for p = 1 : p_rounds
 		fin_sup = calc_sol_support(sol_vecs, wave_func)
 		println(fin_sup)
+		println(norm(wave_func))
+		# print_supstates()
 		wave_func = phase_energy(wave_func, costop_vec, alphas[p])
 		wave_func = apply_xmixer(wave_func, num_bits, betas[p])
 	end
@@ -147,7 +141,6 @@ function run_single_inst(sat_prob::SatProblem)
 	println(fin_sup)
 	return 0 
 end
-
 
 function run_tqaoa(nbits, clen, mclauses, kinsts)
 	dir_str = string("./sat_1in", clen, "_nbits=", nbits, "_mclauses=", mclauses, "_kinsts=", kinsts, "/")
