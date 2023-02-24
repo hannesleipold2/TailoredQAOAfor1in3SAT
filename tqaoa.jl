@@ -61,28 +61,31 @@ function make_costop_vec(sat_prob::SatProblem)
 	red_sols = sat_prob.red_solutions
 	if num_sols != length(red_sols)
 		println("Cost-Op num sols don't match known num sols")
-		breakhere!()
+		throw(DomainError)
 	else 
 		for sol in red_sols
 			sol_int = bit_vec_to_int(sol)
 			if costop_vec[sol_int] != 0
 				println("PROBLEM ", sol_int, " ", costop_vec[sol_int])
-				breakhere!()
+				throw(DomainError)
 			end
 		end
 	end
 	return costop_vec
 end
 
-function phase_energy(wave_func, costop_vec, alpha)
+function phase_energy!(wave_func, costop_vec, alpha)
 	if length(wave_func) != length(costop_vec)
 		println("unmatch cost and wave funcs ", length(wave_func), " ", length(costop_vec))
-		breakhere!()
+		throw(DimensionMismatch)
 	end
-	return [ exp(1.0im * alpha * costop_vec[i]) * wave_func[i] for i = 1 : length(costop_vec) ]
+	for i = 1 : length(costop_vec)
+		wave_func[i] *= exp(1.0im * alpha * costop_vec[i]) 
+	end
+	nothing 
 end
 
-function apply_xmixer(wave_func, num_bits, beta)
+function apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatrixCSC{Complex{Float64}, Int64}, num_bits, beta)
 	num_states = 2^(num_bits)
 	for i = 1 : num_bits
 		U_trans = SparseMatrixCSC{Complex{Float64}, Int64}(spzeros(num_states, num_states))
@@ -134,7 +137,7 @@ function run_single_inst(sat_prob::SatProblem)
 		println(fin_sup)
 		println(norm(wave_func))
 		# print_supstates()
-		wave_func = phase_energy(wave_func, costop_vec, alphas[p])
+		phase_energy!(wave_func, costop_vec, alphas[p])
 		wave_func = apply_xmixer(wave_func, num_bits, betas[p])
 	end
 	fin_sup = calc_sol_support(sol_vecs, wave_func)

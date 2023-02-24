@@ -29,7 +29,7 @@ Here we describe `QAOA1` at a high level. Let $\sigma^{0} =(1/2)(Id + \sigma^{z}
 
 The cost of a clause is given by satisfying one literal and unsatisfying the other literals for `1-in-k SAT`:
 ```math
-    H_{\text{clause}} = \sum_{ (e_{1}, ..., e_{k} ; v_{1}, ..., v_{k} ) } \sum_{i=1}^{k} \sigma_{v_{i}}^{e_{i}} \prod_{j \neq i} \sigma_{v_{j}}^{1 - e_{j}} . 
+    H_{\text{clause}} = Id - \sum_{ (e_{1}, ..., e_{k} ; v_{1}, ..., v_{k} ) } \sum_{i=1}^{k} \sigma_{v_{i}}^{e_{i}} \prod_{j \neq i} \sigma_{v_{j}}^{1 - e_{j}} . 
 ```
 
 Then the phase-separating operator, given a specific $\alpha_{l}$, is just:
@@ -85,11 +85,13 @@ Farhi, E., Goldstone, J., & Gutmann, S. (2014).
 A quantum approximate optimization algorithm. arXiv preprint arXiv:1411.4028.
 
 <a id="1">[3]</a> 
-Leipold, H., Spedalieri, F. M., & Rieffel, E. (2022). Tailored Quantum Alternating Operator Ansätzes for Circuit Fault Diagnostics. Algorithms, 15(10), 356.
-
-<a id="1">[4]</a> 
 Boulebnane, S., & Montanaro, A. (2022). 
 Solving boolean satisfiability problems with the quantum approximate optimization algorithm. arXiv preprint arXiv:2208.06909.
+
+<a id="1">[4]</a> 
+Leipold, H., Spedalieri, F. M., & Rieffel, E. (2022). 
+Tailored Quantum Alternating Operator Ansätzes for Circuit Fault Diagnostics. Algorithms, 15(10), 356.
+
 
 <a id="3">[5]</a> 
 Achlioptas, D., Chtcherba, A., Istrate, G., & Moore, C. (2001, January). 
