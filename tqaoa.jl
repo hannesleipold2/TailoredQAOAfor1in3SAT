@@ -13,6 +13,8 @@ import Unmarshal
 include("bitvec_conversions.jl")
 include("sat_generator.jl")
 include("measures_n_reps.jl")
+include("qaoa_circ.jl")
+include("training.jl")
 
 using .SatGenerator
 #=
@@ -20,94 +22,8 @@ using .SatGenerator
 =#
 
 
-function make_costop_vec(sat_prob::SatProblem)
-	num_bits    = sat_prob.num_red_variables
-	num_states  = 2^(num_bits)
-	clauses     = sat_prob.red_clauses
-	clen        = sat_prob.vars_per_clause
-	costop_vec  = zeros(Complex{Float64}, num_states)
-	for i = 1 : num_states
-		i_bitvec    = int_to_bit_vec(i, num_bits)
-		i_cost      = 0 
-		for clause in clauses
-			c_cost  = 1
-			for j = 1 : length(clause)
-				do_red_cost = 1
-				for k = 1 : length(clause)
-					if j == k 
-						if i_bitvec[clause[k].variable] != clause[k].expected_value
-							do_red_cost = 0
-						end
-					else
-						if i_bitvec[clause[k].variable] == clause[k].expected_value
-							do_red_cost = 0
-						end
-					end
-				end
-				if do_red_cost == 1
-					c_cost = 0
-				end
-			end
-			i_cost += c_cost 
-		end
-		costop_vec[i] = i_cost
-	end
-	num_sols = 0
-	for i = 1 : num_states
-		if costop_vec[i] == 0
-			num_sols += 1
-		end
-	end
-	red_sols = sat_prob.red_solutions
-	if num_sols != length(red_sols)
-		println("Cost-Op num sols don't match known num sols")
-		throw(DomainError)
-	else 
-		for sol in red_sols
-			sol_int = bit_vec_to_int(sol)
-			if costop_vec[sol_int] != 0
-				println("PROBLEM ", sol_int, " ", costop_vec[sol_int])
-				throw(DomainError)
-			end
-		end
-	end
-	return costop_vec
-end
-
-function phase_energy!(wave_func, costop_vec, alpha)
-	if length(wave_func) != length(costop_vec)
-		println("unmatch cost and wave funcs ", length(wave_func), " ", length(costop_vec))
-		throw(DimensionMismatch)
-	end
-	for i = 1 : length(costop_vec)
-		wave_func[i] *= exp(1.0im * alpha * costop_vec[i]) 
-	end
-	nothing 
-end
-
-function apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatrixCSC{Complex{Float64}, Int64}, num_bits, beta)
-	num_states = 2^(num_bits)
-	for i = 1 : num_bits
-		U_trans = SparseMatrixCSC{Complex{Float64}, Int64}(spzeros(num_states, num_states))
-		for j = 1 : num_states
-			j_bitvec 		= int_to_bit_vec(j, num_bits)
-			j_bitvec[i] 	= (j_bitvec[i] + 1) % 2
-			j2				= bit_vec_to_int(j_bitvec) 
-			U_trans[j , j ] = Complex{Float64}(1/2)
-			U_trans[j , j2] = Complex{Float64}(1/2)
-			U_trans[j2, j ] = Complex{Float64}(1/2)
-			U_trans[j2, j2] = Complex{Float64}(1/2)
-		end
-		tmp_func = copy(wave_func)
-		wave_func = Complex{Float64}(exp(-1.0im * pi * beta)) * U_trans * wave_func
-		# println(wave_func)s
-		wave_func = tmp_func - U_trans * tmp_func + wave_func
-	end
-	return wave_func
-end
-
 function run_single_inst(sat_prob::SatProblem)
-	p_rounds    = 50
+	p_rounds    = 20
 	pi_co		= pi / 5
 	alphas      = [ pi_co * (p/p_rounds)       for p = 1 : p_rounds ]
 	betas       = [ pi_co * (1 - (p/p_rounds)) for p = 1 : p_rounds ]
@@ -131,14 +47,15 @@ function run_single_inst(sat_prob::SatProblem)
 	for i = 1 : num_states
 		wave_func[i] = (1/sqrt(num_states))
 	end
-	costop_vec  = make_costop_vec(sat_prob)
+	costop_vec  	= make_costop_vec(sat_prob)
+	hollow_unitary	= SparseMatrixCSC{Complex{Float64}, Int64}(spzeros(num_states, num_states))
 	for p = 1 : p_rounds
 		fin_sup = calc_sol_support(sol_vecs, wave_func)
 		println(fin_sup)
 		println(norm(wave_func))
 		# print_supstates()
 		phase_energy!(wave_func, costop_vec, alphas[p])
-		wave_func = apply_xmixer(wave_func, num_bits, betas[p])
+		wave_func = apply_xmixer(wave_func, hollow_unitary, num_bits, betas[p])
 	end
 	fin_sup = calc_sol_support(sol_vecs, wave_func)
 	println(fin_sup)
@@ -146,7 +63,8 @@ function run_single_inst(sat_prob::SatProblem)
 end
 
 function run_tqaoa(nbits, clen, mclauses, kinsts)
-	dir_str = string("./sat_1in", clen, "_nbits=", nbits, "_mclauses=", mclauses, "_kinsts=", kinsts, "/")
+	upp_dir_str = string("./sat_1in", clen, "/")
+	dir_str = string(upp_dir_str, "rand_insts", "_nbits=", nbits, "_mclauses=", mclauses, "_kinsts=", kinsts, "/")
 	open(string(dir_str,"inst_", 1,".json"), "r") do f 
 		json_string = JSON.read(f, String)
 		new_sat_prob = Unmarshal.unmarshal(SatProblem, JSON.parse(json_string))

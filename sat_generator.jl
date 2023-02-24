@@ -409,7 +409,11 @@ function run_sat(out_dir, nbits, clen, mclauses, kinsts)
 										,	red_to_vars)
 			#
 			# new_sat_prob = SatProblem()
-			dir_str = string("./sat_1in", clen, "_nbits=", nbits, "_mclauses=", mclauses, "_kinsts=", kinsts, "/")
+			upp_dir_str = string("./sat_1in", clen, "/")
+			dir_str = string(upp_dir_str, "rand_insts", "_nbits=", nbits, "_mclauses=", mclauses, "_kinsts=", kinsts, "/")		
+			if !isdir(upp_dir_str)
+				mkdir(upp_dir_str)
+			end
 			if !isdir(dir_str)
 				mkdir(dir_str)
 			end
@@ -420,7 +424,8 @@ function run_sat(out_dir, nbits, clen, mclauses, kinsts)
 		gen_cnt += 1
 	end
 
-	dir_str = string("./sat_1in", clen, "_nbits=", nbits, "_mclauses=", mclauses, "_kinsts=", kinsts, "/")
+	upp_dir_str = string("./sat_1in", clen, "/")
+	dir_str = string(upp_dir_str, "rand_insts", "_nbits=", nbits, "_mclauses=", mclauses, "_kinsts=", kinsts, "/")
 
 	open(string(dir_str,"inst_", 1,".json"), "r") do f 
 		json_string = JSON.read(f, String)
@@ -502,8 +507,8 @@ if length(ARGS) < 4
 	nbits 		= 12
 	clen        = 3
 	cl_to_nb	= binomial(clen, 2)
-	# mclauses    = Int(floor(nbits/cl_to_nb) + clause_num_round(nbits, cl_to_nb))
-	mclauses	= Int(ceil(nbits/cl_to_nb))
+	mclauses    = Int(floor(nbits/cl_to_nb) + clause_num_round(nbits, cl_to_nb))
+	# mclauses	= Int(ceil(nbits/cl_to_nb))
 	kinsts      = 100
 else 
 	println()
