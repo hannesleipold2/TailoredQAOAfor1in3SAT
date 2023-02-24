@@ -13,6 +13,7 @@ import Unmarshal
 include("bitvec_conversions.jl")
 include("sat_generator.jl")
 include("measures_n_reps.jl")
+include("training.jl")
 
 using .SatGenerator
 

@@ -11,12 +11,11 @@ using JSON
 import Unmarshal
 
 include("bitvec_conversions.jl")
-include("sat_generator.jl")
-include("measures_n_reps.jl")
+# include("sat_generator.jl")
+# include("measures_n_reps.jl")
 include("qaoa_circ.jl")
-include("training.jl")
 
-using .SatGenerator
+
 #=
 	# This file is always evolving, title is misleading
 =#
