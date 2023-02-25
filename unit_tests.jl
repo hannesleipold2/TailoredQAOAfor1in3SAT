@@ -7,6 +7,17 @@ println("COMPILE TIME: ", end_compile_time - start_compile_time)
 
 include("bitvec_conversions.jl")
 
+function apply_new_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatrixCSC{Complex{Float64}, Int64}, num_bits, beta)
+    num_states = 2^(num_bits)
+    ket0_at_i = zeros(Complex64, num_states)
+    ket1_at_i = zeros(Complex64, num_states)
+    for i = 1 : num_bits
+        for j = 1 : num_states
+            print(i,j)
+        end
+    end
+end
+
 function apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatrixCSC{Complex{Float64}, Int64}, num_bits, beta)
 	num_states = 2^(num_bits)
 	for i = 1 : num_bits
@@ -23,6 +34,8 @@ function apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatr
 		tmp_func = copy(wave_func)
 		wave_func = Complex{Float64}(exp(-1.0im * pi * beta)) * U_trans * wave_func
 		# println(wave_func)
+        # Base.print_matrix(stdout, U_trans)
+        # println()
 		wave_func = tmp_func - U_trans * tmp_func + wave_func
 		### CLEAR MATRIX ###
 		for j = 1 : num_states
@@ -34,7 +47,9 @@ function apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatr
 			U_trans[j2, j ] = Complex{Float64}(0)
 			U_trans[j2, j2] = Complex{Float64}(0)
 		end
+        dropzeros!(U_trans)
 	end
+    # breakhere!()
 	return wave_func
 end
 
@@ -58,7 +73,7 @@ function unit_tester(num_bits)
         end_time  = Dates.now()
         delta_time= end_time - iter_time
         if (i-1)%(round(NUM_RUNS/10)) == 0
-            println(delta_time)
+            println(round((i-1)/(round(NUM_RUNS/10))), "0% done: ", delta_time)
         end
     end      
     end_time  = Dates.now()
@@ -66,7 +81,7 @@ function unit_tester(num_bits)
 end
 
 
-unit_tester(14)
+unit_tester(15)
 
 
 
