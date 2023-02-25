@@ -1,6 +1,9 @@
+using Dates
+start_compile_time = Dates.now()
 using SparseArrays
 using LinearAlgebra
-using Dates
+end_compile_time = Dates.now()
+println("COMPILE TIME: ", end_compile_time - start_compile_time)
 
 include("bitvec_conversions.jl")
 
@@ -41,8 +44,12 @@ end
 =#
 function unit_tester(num_bits)
     num_states  = 2^(num_bits)
+    wave_time   = Dates.now()
     wave_func   = [ (1.0 + 0.0im)/sqrt(num_states) for i = 1 : num_states ]
-    U_mixer     = SparseMatrixCSC{Complex{Float64},Int64}(spzeros(num_states, num_states))
+    println("WFUNC BUILD TIME: ", Dates.now() - wave_time)
+    mat_time    = Dates.now()
+    U_mixer     = spzeros(Complex{Float64}, num_states, num_states)
+    println("UMAT BUILD TIME: ", Dates.now() - mat_time)
     NUM_RUNS    = 100
     start_time  = Dates.now()
     for i = 1 : NUM_RUNS
@@ -59,7 +66,7 @@ function unit_tester(num_bits)
 end
 
 
-unit_tester(12)
+unit_tester(13)
 
 
 
