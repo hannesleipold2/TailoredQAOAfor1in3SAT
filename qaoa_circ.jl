@@ -13,7 +13,6 @@ import Unmarshal
 include("bitvec_conversions.jl")
 include("sat_generator.jl")
 include("measures_n_reps.jl")
-include("training.jl")
 
 using .SatGenerator
 
@@ -113,4 +112,19 @@ function apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatr
 		end
 	end
 	return wave_func
+end
+
+function run_qaoa_circ(	wave_func::Array{Complex{Float64}}, costop::Array{Complex{Float64}}, U_mixer::SparseMatrixCSC{Complex{Float64}, Int64}, 
+						alphas, betas, pdepth, num_bits)
+	for i = 1 : pdepth
+		phase_energy!(wave_func, costop)
+		wave_func = apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatrixCSC{Complex{Float64}, Int64}, num_bits, beta)
+	end
+	fin_eng = 0 
+end
+
+
+function initialize_wave_func(sat_prob::SatProblem)
+    
+    return 0 
 end
