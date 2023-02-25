@@ -57,7 +57,7 @@ function unit_tester(num_bits)
         wave_func = apply_xmixer(wave_func, U_mixer, num_bits, 0.01)
         end_time  = Dates.now()
         delta_time= end_time - iter_time
-        if i%(round(NUM_RUNS/10)) == 0 
+        if (i-1)%(round(NUM_RUNS/10)) == 0
             println(delta_time)
         end
     end      
@@ -66,7 +66,7 @@ function unit_tester(num_bits)
 end
 
 
-unit_tester(13)
+unit_tester(14)
 
 
 
