@@ -58,7 +58,8 @@ function init_cost_oper(num_bits, clauses, red_sols=[])
             end
         end
     end
-    return CuArray{ComplexF64}(Diagonal(costop_vec))
+    tmp = sparse([ i for i = 1 : length(costop_vec) ], [ i for i = 1 : length(costop_vec) ], costop_vec, length(costop_vec), length(costop_vec))
+    return CUSPARSE.CuSparseMatrixCSC(tmp)
 end
 
 function init_xmixers(num_bits)
@@ -77,7 +78,7 @@ function init_xmixers(num_bits)
             all_U_xmixer[i][j2, j2] = Complex{Float64}(1/2)
         end
     end
-    return [ CUDA.CUSPARSE.CuSparseMatrixCSC(all_U_xmixer[i]) for i = 1 : length(all_U_xmixer) ]
+    return [ CUSPARSE.CuSparseMatrixCSC(all_U_xmixer[i]) for i = 1 : length(all_U_xmixer) ]
 end
 
 function check_cmixer(U_clause_mixers, cl_id, reds_to_acts)
@@ -186,7 +187,7 @@ function init_clause_mixers(num_bits, reds_to_acts, sols_per_clause, uncov_vars)
     num_states = 2^(num_bits)
     all_U_clause_mixers = [ spzeros(Complex{Float64}, num_states, num_states) for i = 1 : (length(sols_per_clause) + length(uncov_vars)) ]
     fill_clause_mixers!(all_U_clause_mixers, num_bits, reds_to_acts, sols_per_clause, uncov_vars)
-    return [ CUDA.CUSPARSE.CuSparseMatrixCSC(all_U_clause_mixers[i]) for i = 1 : length(all_U_clause_mixers) ]
+    return [ CUSPARSE.CuSparseMatrixCSC(all_U_clause_mixers[i]) for i = 1 : length(all_U_clause_mixers) ]
 end
 
 function init_sol_space(red_sols, num_states)

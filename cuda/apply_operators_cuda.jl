@@ -19,10 +19,10 @@ end
 
 
 function phase_energy!(wave_func, costop_vec, alpha)
-    if length(wave_func) != length(costop_vec)
-        println("unmatch cost and wave funcs ", length(wave_func), " ", length(costop_vec))
-        throw(DimensionMismatch)
-    end
+    #if length(wave_func) != length(costop_vec)
+    #    println("unmatch cost and wave funcs ", length(wave_func), " ", length(costop_vec))
+    #    throw(DimensionMismatch)
+    #end
     wave_func = cuda_exp( 1.0im * costop_vec) * wave_func
     #for i = 1 : length(costop_vec)
     #    wave_func[i] *= exp(1.0im * alpha * costop_vec[i]) 
