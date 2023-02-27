@@ -9,7 +9,7 @@ using JSON
 # using StructTypes
 using CUDA
 
-include("bitvec_conversions.jl")
+include("bitvec_conversions_cuda.jl")
 
 function init_cost_oper(num_bits, clauses, red_sols=[])
     num_states  = 2^(num_bits)

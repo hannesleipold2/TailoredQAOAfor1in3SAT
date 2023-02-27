@@ -13,7 +13,7 @@ import Unmarshal
 
 module SatGenerator
 
-    include("bitvec_conversions.jl")
+    include("bitvec_conversions_cuda.jl")
 
     export Literal, SatType, SatProblem
 

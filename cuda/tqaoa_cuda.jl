@@ -10,14 +10,14 @@ using JSON
 
 import Unmarshal
 
-include("bitvec_conversions.jl")
-include("sat_problem.jl")
+include("bitvec_conversions_cuda.jl")
+include("sat_problem_cuda.jl")
 using .SatGenerator
 include("measures_n_reps_cuda.jl")
-include("tailor_space.jl")
+include("../tailor_space.jl")
 include("init_operators_cuda.jl")
 include("apply_operators_cuda.jl")
-#include("training.jl")
+include("training_cuda.jl")
 # include("qaoa_circ.jl")
 
 
