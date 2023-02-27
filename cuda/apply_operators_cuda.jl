@@ -23,8 +23,7 @@ function phase_energy!(wave_func, costop_vec, alpha)
         println("unmatch cost and wave funcs ", length(wave_func), " ", length(costop_vec))
         throw(DimensionMismatch)
     end
-    #CuArray{ComplexF64}(Diagonal(costop_vec)) * wave_func
-    wave_func = cuda_exp( 1.0im * CuArray{ComplexF64}(Diagonal(costop_vec))) * wave_func
+    wave_func = cuda_exp( 1.0im * costop_vec) * wave_func
     #for i = 1 : length(costop_vec)
     #    wave_func[i] *= exp(1.0im * alpha * costop_vec[i]) 
     #end

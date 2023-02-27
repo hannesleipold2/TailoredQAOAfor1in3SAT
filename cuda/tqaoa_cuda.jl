@@ -35,7 +35,7 @@ function run_t_qaoa(wave_func, costop_vec, U_clause_mixers, p_rounds, alphas, be
     copy_wave_func = copy(wave_func)
     for p = 1 : p_rounds
         fin_sup = calc_sol_support(sol_vecs, wave_func)
-        fin_eng = CUDA.dot(wave_func, CuArray{ComplexF64}(Diagonal(costop_vec)) * wave_func )
+        fin_eng = CUDA.dot(wave_func, costop_vec * wave_func )
         #fin_eng = dot(wave_func, wave_func .* costop_vec)
         println(string("SOLUTION SUPPORT: \t", string(fin_sup+0.00001)[1:5]))
         println(string("EXP COST: \t\t", string(fin_eng + 0.00001)[1:5]))
@@ -45,7 +45,7 @@ function run_t_qaoa(wave_func, costop_vec, U_clause_mixers, p_rounds, alphas, be
     end
 
     fin_sup = calc_sol_support(sol_vecs, wave_func)
-    fin_eng = CUDA.dot(wave_func, CuArray{ComplexF64}(Diagonal(costop_vec)) * wave_func )
+    fin_eng = CUDA.dot(wave_func, costop_vec * wave_func )
     #fin_eng = dot(wave_func, wave_func .* costop_vec)
     println()
     println(string("SOLUTION SUPPORT: \t", string(fin_sup+0.00001)[1:5]))
@@ -89,9 +89,7 @@ function run_ut_qaoa(given_wave_func, costop_vec, U_xmixers, p_rounds, alphas, b
     for p = 1 : p_rounds
         fin_sup = calc_sol_support(sol_vecs, wave_func)
         #cpu_intermediete = wave_func .* costop_vec
-        #fin_eng = CUDA.dot(wave_func, wave_func .* costop_vec)
-        #fin_eng = CUDA.dot(wave_func, CUSPARSE.CuSparseMatrixCSC{Complex{Float64}, Int32}(CuArray{ComplexF64}(Diagonal(costop_vec))) * wave_func )
-        fin_eng = CUDA.dot(wave_func, CuArray{ComplexF64}(Diagonal(costop_vec)) * wave_func )
+        fin_eng = CUDA.dot(wave_func, costop_vec * wave_func )
         if DO_PRINT == 1
             println(string("SOLUTION SUPPORT: \t", string(fin_sup+0.00001)[1:5]))
             println(string("EXP COST: \t\t", string(fin_eng + 0.00001)[1:5]))
@@ -103,7 +101,7 @@ function run_ut_qaoa(given_wave_func, costop_vec, U_xmixers, p_rounds, alphas, b
 
     fin_sup = calc_sol_support(sol_vecs, wave_func)
     #fin_eng = dot(wave_func, wave_func .* costop_vec)
-    fin_eng = abs(CUDA.dot(wave_func, CuArray{ComplexF64}(Diagonal(costop_vec)) * wave_func ))
+    fin_eng = abs(CUDA.dot(wave_func, costop_vec * wave_func ))
     #fin_eng = abs(dot(wave_func, wave_func .* costop_vec))
     if DO_PRINT == 1
         println()

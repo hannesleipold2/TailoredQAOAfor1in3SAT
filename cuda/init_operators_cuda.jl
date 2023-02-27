@@ -58,7 +58,7 @@ function init_cost_oper(num_bits, clauses, red_sols=[])
             end
         end
     end
-    return costop_vec
+    return CuArray{ComplexF64}(Diagonal(costop_vec))
 end
 
 function init_xmixers(num_bits)
