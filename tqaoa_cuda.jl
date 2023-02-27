@@ -156,16 +156,7 @@ function train_general_qaoa(nbits, clen, mclauses, kinsts)
             push!(new_sat_probs, new_sat_prob)
         end
     end
-    simple_run_ut_qaoa(new_sat_probs[1])
-    #train_ut_qaoa(new_sat_probs)
+    #simple_run_ut_qaoa(new_sat_probs[1])
+    train_ut_qaoa(new_sat_probs)
     return 0 
 end
-
-# run_general_qaoa(12, 3, Int(ceil(12/3)), 100)
-@time train_general_qaoa(12, 3, Int(ceil(12/3)), 100)
-
-
-
-
-
-
