@@ -36,3 +36,14 @@ function print_supstates(wave_func, sol_vecs, H_final, state_len)
 	println(abs(dot(wave_func, H_final * wave_func)))
 	println(norm(wave_func))
 end
+
+
+
+
+
+
+
+
+
+
+

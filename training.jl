@@ -2,6 +2,9 @@ using Random
 using Dates
 using JSON 
 include("apply_operators.jl")
+include("sat_problem.jl")
+
+using .SatGenerator
 
 import Unmarshal
 
@@ -9,9 +12,15 @@ struct AngleParams
 	pdepth::Int64
 	avg_fin_eng::Float64
 	avg_fin_sup::Float64
+	num_epochs::Int64
+	num_runs::Int64 
+	epoch_engs::Array{Float64, 1}
+	epoch_sups::Array{Float64, 1}
 	alphas::Array{Float64, 1}
 	betas::Array{Float64, 1}
 end
+
+
 
 
 function train_run_t_qaoa(wave_func, costop_vec, U_clause_mixers, p_rounds, alphas, betas, sol_vecs, num_bits, num_states)
@@ -154,7 +163,8 @@ function init_alphas_n_betas(pdepth, alpha_co, beta_co, INIT_CHOICE=1)
 	end 
 end
 
-function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=5000, num_epochs=10, pdepth=14, batch_size=1)
+
+function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=10000, num_epochs=10, pdepth=14, batch_size=1)
 	## filter batches to have the same overall reduced size
 	unred_num_bits 	= sat_probs[ 1 ].num_variables
 	num_clauses 	= sat_probs[ 1 ].num_clauses
@@ -179,7 +189,27 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=5000, num_epoch
 	all_costop_vecs = [ init_cost_oper(all_num_bits[ i ], all_clauses[ i ]) 				for i = 1 : kinsts ]
 	all_sol_vecs	= [ init_sol_space(sat_probs[ i ].red_solutions, all_num_states[ i ]) 	for i = 1 : kinsts ]
 
+	###		EVAL		###
+	function apply_epoch(curr_alphas, curr_betas)
+		avg_fin_eng	= 0
+		avg_fin_sup	= 0
+		for k = 1 : kinsts
+			num_bits 			= all_num_bits[ k ]
+			num_states			= 2^(num_bits)
+			ind_id 				= bit_to_ind[ num_bits ]
+			fin_eng, fin_sup 	= run_ut_qaoa(all_wave_funcs[ ind_id ], all_costop_vecs[ k ], all_U_xmixers[ ind_id ], pdepth, 
+											curr_alphas, curr_betas, all_sol_vecs[ k ], num_bits, num_states)
+			avg_fin_eng 		+= fin_eng/kinsts
+			avg_fin_sup 		+= fin_sup/kinsts
+		end	 
+		return avg_fin_eng, avg_fin_sup
+	end
+	
 	### 	RUN 		###
+	SHIFT_SIZE 		= 0.005
+	GRAD_COEF 		= 0.05 
+	epoch_engs 		= Array{Float64, 1}()
+	epoch_sups 		= Array{Float64, 1}()
 	best_alphas		= [ 0.0 for i = 1 : pdepth ]
 	best_betas 		= [ 0.0 for i = 1 : pdepth ]
 	best_avg_fin_eng= 2^(unred_num_bits)  
@@ -214,14 +244,15 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=5000, num_epoch
 				end
 				=# 
 				## OPT ##
-				SHIFT_SIZE 	= 0.005
-				GRAD_COEF 	= 0.025 
 				grads 		= Array{Float64, 1}()
 				start_time 	= Dates.now()
 				for run_id = 1 : num_runs # num_runs
 					if run_id%Int(num_runs/10) == 0
 						print()
 						println(Int(run_id/Int(num_runs/10)), "0% ", Dates.now() - start_time)
+						avg_fin_eng, avg_fin_sup = apply_epoch(curr_alphas, curr_betas)
+						push!(epoch_engs, avg_fin_eng)
+						push!(epoch_sups, avg_fin_sup)
 					end
 					rand_id 	= rand(1:kinsts)
 					num_bits 	= all_num_bits[ rand_id ]
@@ -280,11 +311,13 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=5000, num_epoch
 	println(best_num_alpha)
 	println(best_num_beta)
 	println(BEST_CHOICE)
-	breakhere!()
 	###		SAVE		###
-	res_params		= AngleParams(pdepth, best_alphas, best_betas)
+	res_params		= AngleParams(pdepth, best_avg_fin_eng, best_avg_fin_sup, num_epochs, num_runs, epoch_engs, epoch_sups, best_alphas, best_betas)
 	upp_dir_str		= string("./train_angles/")
-	out_path		= string(upp_dir_str, "rand_insts", "_nbits=", nbits, "_mclauses=", mclauses, "_kinsts=", kinsts,"_pdepth=", pdepth, ".json")
+	if !isdir(upp_dir_str)
+		mkdir(upp_dir_str)
+	end
+	out_path		= string(upp_dir_str, "rand_insts", "_nbits=", unred_num_bits, "_mclauses=", num_clauses, "_kinsts=", kinsts,"_pdepth=", pdepth, ".json")
 	open(out_path, "w") do f
 		JSON.print(f, res_params, 4)
 	end
@@ -296,7 +329,19 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=5000, num_epoch
 	return 0 
 end
 
-
+#=
+struct AngleParams
+	pdepth::Int64
+	avg_fin_eng::Float64
+	avg_fin_sup::Float64
+	epoch_num::Float64
+	num_runs::Int64 
+	epoch_engs::Array{Float64, 1}
+	epoch_sups::Array{Float64, 1}
+	alphas::Array{Float64, 1}
+	betas::Array{Float64, 1}
+end
+=#
 
 
 

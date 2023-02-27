@@ -1,5 +1,6 @@
 using LoopVectorization 
 
+
 copytontt!(B, A) = vmapntt!(identity, B, A)
 
 function phase_energy!(wave_func, costop_vec, alpha)
