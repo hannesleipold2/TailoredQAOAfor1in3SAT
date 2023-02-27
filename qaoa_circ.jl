@@ -11,8 +11,9 @@ using JSON
 import Unmarshal
 
 include("bitvec_conversions.jl")
-include("sat_generator.jl")
+include("sat_problem.jl")
 include("measures_n_reps.jl")
+include("tailor_space.jl")
 
 using .SatGenerator
 
@@ -82,7 +83,6 @@ function phase_energy!(wave_func, costop_vec, alpha)
 	nothing 
 end
 
-
 function apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatrixCSC{Complex{Float64}, Int64}, num_bits, beta)
 	num_states = 2^(num_bits)
 	for i = 1 : num_bits
@@ -114,17 +114,64 @@ function apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatr
 	return wave_func
 end
 
+function apply_clause_mixer(wave_func::Array{Complex{Float64}, 1}, U_clause::SparseMatrixCSC{Complex{Float64}, Int64}, 
+							redbits_to_actbits, sol_per_clause, uncov_vars, num_bits, beta)
+	num_states = 2^(num_bits)
+	for cl_id = 1 : length(sol_per_clause)
+		for i = 1 : num_states
+			i_vec = int_to_bit_vec(i, num_bits)
+			U_clause[ i ][ i ] = 1.0/length(sol_per_clause[cl_id][j])
+			for j = 1 : length(sol_per_clause[cl_id])
+				for k = 1 : length(sol_per_clause[cl_id])
+					if j == k 
+						continue 
+					end
+					i_vec[ sol_per_clause[cl_id][ j ][ l ][ 1 ] ] = sol_per_clause[cl_id][ k ][ l ][ 2 ]
+				end
+				U_clause[ i ][ bit_vec_to_int(i_vec) ] = 1.0/length(sol_per_clause[cl_id][j])
+			end
+		end
+		wave_func = U_clause * wave_func
+	end
+	for i in uncov_vars
+		### BUILD MATRIX ###
+		for j = 1 : num_states
+			j_bitvec 		 = int_to_bit_vec(j, num_bits)
+			j_bitvec[i] 	 = (j_bitvec[i] + 1) % 2
+			j2				 = bit_vec_to_int(j_bitvec) 
+			U_clause[j , j ] = Complex{Float64}(1/2)
+			U_clause[j , j2] = Complex{Float64}(1/2)
+			U_clause[j2, j ] = Complex{Float64}(1/2)
+			U_clause[j2, j2] = Complex{Float64}(1/2)
+		end
+		tmp_func = copy(wave_func)
+		wave_func = Complex{Float64}(exp(-1.0im * pi * beta)) * U_trans * wave_func
+		# println(wave_func)
+		wave_func = tmp_func - U_trans * tmp_func + wave_func
+		### CLEAR MATRIX ###
+		for j = 1 : num_states
+			j_bitvec 		= int_to_bit_vec(j, num_bits)
+			j_bitvec[i] 	= (j_bitvec[i] + 1) % 2
+			j2				= bit_vec_to_int(j_bitvec) 
+			U_clause[j , j ] = Complex{Float64}(0)
+			U_clause[j , j2] = Complex{Float64}(0)
+			U_clause[j2, j ] = Complex{Float64}(0)
+			U_clause[j2, j2] = Complex{Float64}(0)
+		end
+	end
+	return wave_func
+end
+
+
+
 function run_qaoa_circ(	wave_func::Array{Complex{Float64}}, costop::Array{Complex{Float64}}, U_mixer::SparseMatrixCSC{Complex{Float64}, Int64}, 
 						alphas, betas, pdepth, num_bits)
 	for i = 1 : pdepth
 		phase_energy!(wave_func, costop)
-		wave_func = apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatrixCSC{Complex{Float64}, Int64}, num_bits, beta)
+		copyto!(wave_func, apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatrixCSC{Complex{Float64}, Int64}, num_bits, beta))
 	end
-	fin_eng = 0 
+	fin_eng = dot(wave_func, costop .* wave_func)
+	fin_sup = calc_sol_support() 
 end
 
 
-function initialize_wave_func(sat_prob::SatProblem)
-    
-    return 0 
-end
