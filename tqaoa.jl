@@ -152,13 +152,13 @@ function train_general_qaoa(nbits, clen, mclauses, kinsts, RUN_OPT=1)
 	if 		RUN_OPT == 1
 		train_ut_qaoa(new_sat_probs)
 	elseif 	RUN_OPT == 2
-		simple_run_t_qaoa(new_sat_probs[ 1 ])
+		simple_run_ut_qaoa(new_sat_probs[ 1 ])
 	end
 	return 0 
 end
 
 # run_general_qaoa(12, 3, Int(ceil(12/3)), 100)
-train_general_qaoa(12, 3, Int(ceil(12/3)), 100, 2)
+@time train_general_qaoa(12, 3, Int(ceil(12/3)), 100, 2)
 
 
 
