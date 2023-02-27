@@ -1,6 +1,6 @@
 using LoopVectorization 
 using CUDA
-using ExponentialUtilities
+#using ExponentialUtilities
 
 copytontt!(B, A) = vmapntt!(identity, B, A)
 
