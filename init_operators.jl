@@ -82,15 +82,18 @@ function check_cmixer(U_clause_mixers, cl_id, reds_to_acts)
 	num_cnt = 0
 	for i = 1 : length(reds_to_acts)
 		for j = 1 : length(reds_to_acts)
-			if abs(U_clause_mixers[ cl_id ][ i , j ]) > 0.5
+			if abs(U_clause_mixers[ cl_id ][ reds_to_acts[i] , reds_to_acts[j] ]) > 0.01
 				num_cnt += 1
 			end
 		end
 	end
 	if nnz(U_clause_mixers[cl_id]) > num_cnt
 		rows = rowvals(U_clause_mixers[cl_id])
+		I, J, V = U_clause_mixers[ cl_id ]
+		println(I)
+		println(J)
+		println(V)
 		println(rows)
-		println(vals) 
 		println(nnz(U_clause_mixers[cl_id]))
 		println(num_cnt)
 		println(cl_id)
@@ -100,10 +103,12 @@ end
 
 function fill_clause_mixers!(all_U_clause_mixers, num_bits, reds_to_acts, sols_per_clause, uncov_vars)
 	num_states = 2^(num_bits)
+	#=
 	a_set = Set{Int64}()
 	for i = 1 : length(reds_to_acts)
 		push!(a_set, reds_to_acts[ i ])
 	end
+	=#
 	for cl_id = 1 : length(sols_per_clause)
 		for i = 1 : length(reds_to_acts)
 			i_val = reds_to_acts[ i ]
@@ -117,7 +122,7 @@ function fill_clause_mixers!(all_U_clause_mixers, num_bits, reds_to_acts, sols_p
 					end
 				end
 				if skip_val == 1
-					println("SKIPPED")
+					# println("SKIPPED")
 					continue
 				end
 				all_U_clause_mixers[ cl_id ][ i_val, i_val ] = 1.0/length(sols_per_clause[ cl_id ][ j ])
@@ -126,25 +131,27 @@ function fill_clause_mixers!(all_U_clause_mixers, num_bits, reds_to_acts, sols_p
 						continue 
 					end
 					# println(sols_per_clause[cl_id][ j ])
-					println(sols_per_clause[cl_id][ j ])
-					println(sols_per_clause[cl_id][ k ])
-					println(length(sols_per_clause[cl_id]))
-					println()
+					# println(sols_per_clause[cl_id][ j ])
+					# println(sols_per_clause[cl_id][ k ])
+					# println(length(sols_per_clause[cl_id]))
+					# println()
 					for l = 1 : length(sols_per_clause[ cl_id ][ j ])
 						i_vec[ sols_per_clause[cl_id][ j ][ l ][ 1 ] ] = sols_per_clause[cl_id][ k ][ l ][ 2 ]
 					end
 					r_val = bit_vec_to_int(i_vec)
+					#=
 					if !(r_val in a_set)
 						println(r_val)
 						println(i_val)
 						println(sols_per_clause[cl_id][ k ])
 						breakhere!()
 					end
+					=# 
 					all_U_clause_mixers[ cl_id ][ i_val, r_val ] = 1.0/length(sols_per_clause[cl_id][ j ])
 				end
 			end
 		end 
-		check_cmixer(all_U_clause_mixers, cl_id, reds_to_acts)
+		# check_cmixer(all_U_clause_mixers, cl_id, reds_to_acts)
 	end
 	mat_id = length(sols_per_clause)
 	for i in uncov_vars
@@ -159,22 +166,16 @@ function fill_clause_mixers!(all_U_clause_mixers, num_bits, reds_to_acts, sols_p
 			all_U_clause_mixers[ mat_id ][ j_val , j_val2 ] = Complex{Float64}(1/2)
 			all_U_clause_mixers[ mat_id ][ j_val2, j_val  ] = Complex{Float64}(1/2)
 			all_U_clause_mixers[ mat_id ][ j_val2, j_val2 ] = Complex{Float64}(1/2)
+			#= 
 			if !(j_val2 in a_set)
 				println(j_val)
 				println(j_val2)
 				println(sols_per_clause[cl_id][ k ])
 				breakhere!()
 			end
+			=# 
 		end
-		check_cmixer(all_U_clause_mixers, cl_id, reds_to_acts)
-	end
-	for mat_id = 1 : length(all_U_clause_mixers)
-		if nnz(all_U_clause_mixers[ mat_id ]) != length(reds_to_acts)^2
-			println()
-			println(nnz(all_U_clause_mixers[ mat_id ]))
-			println(length(reds_to_acts)^2)
-			breakhere!()
-		end
+		# check_cmixer(all_U_clause_mixers, mat_id, reds_to_acts)
 	end
 	nothing 
 end
@@ -209,7 +210,7 @@ end
 function init_t_wavefunc(num_states, reds_to_acts)
 	wave_func = spzeros(Complex{Float64}, num_states)
 	for i = 1 : length(reds_to_acts)
-		wave_func[i] = (1/sqrt(length(reds_to_acts)))
+		wave_func[ reds_to_acts[ i ] ] = (1/sqrt(length(reds_to_acts)))
 	end
 	return wave_func
 end

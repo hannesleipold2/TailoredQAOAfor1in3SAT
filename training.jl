@@ -21,8 +21,6 @@ struct AngleParams
 end
 
 
-
-
 function train_run_t_qaoa(wave_func, costop_vec, U_clause_mixers, p_rounds, alphas, betas, sol_vecs, num_bits, num_states)
 	copy_wave_func = copy(wave_func)
 	for p = 1 : p_rounds
@@ -246,6 +244,8 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=10000, num_epoc
 				## OPT ##
 				grads 		= Array{Float64, 1}()
 				start_time 	= Dates.now()
+				avg_fin_eng = 0
+				avg_fin_sup	= 0
 				for run_id = 1 : num_runs # num_runs
 					if run_id%Int(num_runs/10) == 0
 						print()
@@ -270,9 +270,6 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=10000, num_epoc
 														curr_alphas, curr_betas, [ all_sol_vecs[ cost_id ] for cost_id in cost_ids ], num_bits, num_states)
 					push!(grads, appro_grad)
 				end
-				# println(grads)
-				avg_fin_eng = 0
-				avg_fin_sup	= 0
 				## EVAL ##
 				for k = 1 : kinsts
 					num_bits 			= all_num_bits[ k ]
@@ -283,15 +280,6 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=10000, num_epoc
 					avg_fin_eng 		+= fin_eng/kinsts
 					avg_fin_sup 		+= fin_sup/kinsts
 				end
-				# println("ENG: \t", before_fin_eng, "\t\t SUP: \t", before_fin_sup)
-				# println("ENG: \t", avg_fin_eng, "\t\t SUP: \t", avg_fin_sup)
-				# println(curr_alphas)
-				# println(curr_betas)
-				# breakhere!()
-				# println(i, " ", j)
-				# println(avg_fin_eng)
-				# println(avg_fin_sup)
-				# println()
 				if avg_fin_eng < best_avg_fin_eng
 					best_avg_fin_eng 	= avg_fin_eng 
 					best_avg_fin_sup 	= avg_fin_sup
@@ -328,6 +316,132 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=10000, num_epoc
 	end
 	return 0 
 end
+
+
+function train_t_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=10000, num_epochs=10, pdepth=14, batch_size=1)
+	## filter batches to have the same overall reduced size
+	unred_num_bits 	= sat_probs[ 1 ].num_variables
+	num_clauses 	= sat_probs[ 1 ].num_clauses
+	kinsts 			= length(sat_probs)
+	### 	SET-UP 		###
+	all_num_bits	= [ sat_probs[ i ].num_red_variables 									for i = 1 : kinsts ]
+	all_num_states 	= [ 2^(all_num_bits[ i ]) 												for i = 1 : kinsts ]
+	all_clauses 	= [ sat_probs[ i ].red_clauses 											for i = 1 : kinsts ]
+	
+	curr_clause_mixer 	= SparseMatrixCSC{Complex{Float64}, Int64}()
+	curr_wfunc			= SparseArrays{Complex{Float64}}() 
+	curr_costop			= SparseArrays{Complex{Float64}}()
+
+	###		EVAL		###
+	function apply_epoch(curr_alphas, curr_betas)
+		avg_fin_eng	= 0
+		avg_fin_sup	= 0
+		for k = 1 : kinsts
+			num_bits 			= all_num_bits[ k ]
+			num_states			= 2^(num_bits)
+			ind_id 				= bit_to_ind[ num_bits ]
+			fin_eng, fin_sup 	= run_ut_qaoa(curr_wfunc, curr_costop, curr_clause_mixer, pdepth, 
+											curr_alphas, curr_betas, all_sol_vecs[ k ], num_bits, num_states)
+			avg_fin_eng 		+= fin_eng/kinsts
+			avg_fin_sup 		+= fin_sup/kinsts
+		end	 
+		return avg_fin_eng, avg_fin_sup
+	end
+	
+	# sparse([ i for i = 1 : length(costop_vec) ], [ i for i = 1 : length(costop_vec) ], costop_vec, length(costop_vec), length(costop_vec))
+
+	### 	RUN 		###
+	SHIFT_SIZE 		= 0.005
+	GRAD_COEF 		= 0.05 
+	epoch_engs 		= Array{Float64, 1}()
+	epoch_sups 		= Array{Float64, 1}()
+	best_alphas		= [ 0.0 for i = 1 : pdepth ]
+	best_betas 		= [ 0.0 for i = 1 : pdepth ]
+	best_avg_fin_eng= 2^(unred_num_bits)  
+	best_avg_fin_sup= 0
+	best_num_alpha	= 0
+	best_num_beta 	= 0
+	num_alphas		= 10
+	num_betas		= 10
+	alpha_cos 		= [ 0.20 * i/num_alphas for i = 1 : num_alphas ]
+	beta_cos 		= [ 0.05 * i/num_betas 	for i = 1 : num_betas  ]
+	BEST_CHOICE		= 0
+	NUM_INIT_CHOICES= 2
+	for i = 1 : num_alphas
+		for j = 1 : num_betas
+			println("SWEEPING: ", i, " ", j)
+			for INIT_CHOICE = 1 : NUM_INIT_CHOICES
+				curr_alphas, curr_betas = init_alphas_n_betas(pdepth, alpha_cos[ i ], beta_cos[ j ], INIT_CHOICE)
+				## OPT ##
+				grads 		= Array{Float64, 1}()
+				start_time 	= Dates.now()
+				avg_fin_eng = 0
+				avg_fin_sup	= 0
+				for run_id = 1 : num_runs # num_runs
+					if run_id%Int(num_runs/10) == 0
+						print()
+						println(Int(run_id/Int(num_runs/10)), "0% ", Dates.now() - start_time)
+						avg_fin_eng, avg_fin_sup = apply_epoch(curr_alphas, curr_betas)
+						push!(epoch_engs, avg_fin_eng)
+						push!(epoch_sups, avg_fin_sup)
+					end
+					rand_id 	= rand(1:kinsts)
+					num_bits 	= all_num_bits[ rand_id ]
+					num_states	= 2^(num_bits)
+					ind_id 		= bit_to_ind[ num_bits ]
+					for i = 1 : length(cost_ids)
+						if all_num_bits[ length(cost_ids) - i + 1 ] != num_bits
+							delete!(cost_ids, length(cost_ids) - i + 1)
+						end
+					end
+					### GEN WV, COST, MIXER ###
+					curr_wfunc			= 0
+					curr_costop			= 0 
+					curr_clause_mixer 	= 0 
+					appro_grad 			= simple_param_shift(curr_wfunc, [ all_costop_vecs[ cost_id ] for cost_id in cost_ids ], all_U_clause_mixers[ ind_id ], pdepth, 
+														curr_alphas, curr_betas, [ all_sol_vecs[ cost_id ] for cost_id in cost_ids ], num_bits, num_states)
+					push!(grads, appro_grad)
+				end
+				if avg_fin_eng < best_avg_fin_eng
+					best_avg_fin_eng 	= avg_fin_eng 
+					best_avg_fin_sup 	= avg_fin_sup
+					best_num_alpha		= i 
+					best_num_beta 		= j
+					BEST_CHOICE			= INIT_CHOICE
+					copyto!(best_alphas, curr_alphas)
+					copyto!(best_betas,  curr_betas)
+				end
+			end
+		end
+	end
+	println(best_alphas)
+	println(best_betas)
+	println(best_avg_fin_eng)
+	println(best_avg_fin_sup)
+	println(best_num_alpha)
+	println(best_num_beta)
+	println(BEST_CHOICE)
+	###		SAVE		###
+	res_params		= AngleParams(pdepth, best_avg_fin_eng, best_avg_fin_sup, num_epochs, num_runs, epoch_engs, epoch_sups, best_alphas, best_betas)
+	upp_dir_str		= string("./train_angles/")
+	if !isdir(upp_dir_str)
+		mkdir(upp_dir_str)
+	end
+	out_path		= string(upp_dir_str, "rand_insts", "_nbits=", unred_num_bits, "_mclauses=", num_clauses, "_kinsts=", kinsts,"_pdepth=", pdepth, ".json")
+	open(out_path, "w") do f
+		JSON.print(f, res_params, 4)
+	end
+	open(out_path, "r") do f
+		json_string = JSON.read(f, String)
+		read_params = Unmarshal.unmarshal(AngleParams, JSON.parse(json_string))
+		println(read_params)
+	end
+	return 0 
+end
+
+
+
+
 
 #=
 struct AngleParams

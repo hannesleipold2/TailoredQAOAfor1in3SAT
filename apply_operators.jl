@@ -70,18 +70,25 @@ end
 function apply_all_clause_mixers(wave_func::SparseVector{Complex{Float64}, Int64}, copy_wave_func::SparseVector{Complex{Float64}, Int64}, U_clause_mixers::Array{SparseMatrixCSC{Complex{Float64}, Int64}, 1}, num_bits, beta)
 	num_states = 2^(num_bits)
 	for i = 1 : length(U_clause_mixers)
-		before_nnz = nnz(wave_func)
-		wave_func = wave_func + (Complex{Float64}(exp(-1.0im * pi * beta) - 1) * U_clause_mixers[ i ] * wave_func)
+		# before_nnz 	= nnz(wave_func)
+		# wi1, wv1 	= findnz(wave_func)
+		wave_func 	= wave_func + (Complex{Float64}(exp(-1.0im * pi * beta) - 1) * U_clause_mixers[ i ] * wave_func)
 		# wave_func = U_xmixers[i] * wave_func
 		# wave_func *= Complex{Float64}(exp(-1.0im * pi * beta) - 1)
 		# wave_func = copy_wave_func + wave_func
 		# copyto!(copy_wave_func, wave_func)
-		after_nnz = nnz(wave_func)
+		# after_nnz 	= nnz(wave_func)
+		# Ui, Uj, Uv 	= findnz(U_clause_mixers[ i ])
+		# wi2, wv2 	= findnz(wave_func) 
+		#=
 		if after_nnz > before_nnz
+			println(setdiff(wi2, wi1))
+			println(setdiff(Ui, wi1))
+			println(setdiff(Uj, wi1))
 			println(after_nnz, " ", before_nnz)
 			breakhere!()
 		end
-	
+		=# 
 	end
 	return wave_func 
 end

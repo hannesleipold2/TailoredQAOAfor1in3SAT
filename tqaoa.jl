@@ -31,24 +31,29 @@ function simple_alphabeta()
 	return p_rounds, alphas, betas
 end
 
-function run_t_qaoa(wave_func, costop_vec, U_clause_mixers, p_rounds, alphas, betas, sol_vecs, num_bits, num_states)
-	copy_wave_func = copy(wave_func)
+function run_t_qaoa(given_wave_func, costop_vec, U_clause_mixers, p_rounds, alphas, betas, sol_vecs, num_bits, num_states, DO_PRINT=0)
+	wave_func 		= copy(given_wave_func)
+	copy_wave_func 	= copy(wave_func)
 	for p = 1 : p_rounds
 		fin_sup = calc_sol_support(sol_vecs, wave_func)
 		fin_eng = dot(wave_func, wave_func .* costop_vec)
-		println(string("SOLUTION SUPPORT: \t", string(fin_sup+0.00001)[1:5]))
-		println(string("EXP COST: \t\t", string(fin_eng + 0.00001)[1:5]))
-		println(string("NORM: \t\t\t", string(norm(wave_func) + 0.00001)[1:5]))
+		if DO_PRINT == 1
+			println(string("SOLUTION SUPPORT: \t", string(fin_sup+0.00001)[1:5]))
+			println(string("EXP COST: \t\t", string(fin_eng + 0.00001)[1:5]))
+			println(string("NORM: \t\t\t", string(norm(wave_func) + 0.00001)[1:5]))
+		end
 		phase_energy!(wave_func, costop_vec, alphas[ p ])
 		wave_func = apply_all_clause_mixers(wave_func, copy_wave_func, U_clause_mixers, num_bits, betas[ p ])
 	end
 
 	fin_sup = calc_sol_support(sol_vecs, wave_func)
 	fin_eng = dot(wave_func, wave_func .* costop_vec)
-	println()
-	println(string("SOLUTION SUPPORT: \t", string(fin_sup+0.00001)[1:5]))
-	println(string("EXP COST: \t\t", string(fin_eng + 0.00001)[1:5]))
-	println(string("NORM: \t\t\t", string(norm(wave_func)+0.00001)[1:5]))
+	if DO_PRINT == 1
+		println()
+		println(string("SOLUTION SUPPORT: \t", string(fin_sup+0.00001)[1:5]))
+		println(string("EXP COST: \t\t", string(fin_eng + 0.00001)[1:5]))
+		println(string("NORM: \t\t\t", string(norm(wave_func)+0.00001)[1:5]))
+	end
 	return fin_eng, fin_sup
 end
 
@@ -152,7 +157,7 @@ function train_general_qaoa(nbits, clen, mclauses, kinsts, RUN_OPT=1)
 	if 		RUN_OPT == 1
 		train_ut_qaoa(new_sat_probs)
 	elseif 	RUN_OPT == 2
-		simple_run_ut_qaoa(new_sat_probs[ 1 ])
+		simple_run_t_qaoa(new_sat_probs[ 1 ])
 	end
 	return 0 
 end
