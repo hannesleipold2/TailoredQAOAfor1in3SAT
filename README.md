@@ -6,7 +6,7 @@ Everyone knows that a suit from a tailor cannot be compared to a suit made off t
 
 Following recent results obtained with the Quantum Approximate Optimization Algorithm (`QAOA1`)[[2]](#2) by [Boulebnane and Montanaro](https://arxiv.org/abs/2208.06909)[[3]](#3) showing **quantum advantage**, we empirical benchmark `QAOA1` against a tailored `QAOA` approach on the `1-in-3 SAT` problem, showing **superpolynomial** improvement for an exponential fit on both approaches. 
 
-`B&M` train `QAOA1` on size $12$ instances and benchmark the algorithm for size up to $20$ for different `k-SAT` problems. They compared their results for `8-SAT` to `WalkSAT` and found a slight quantum advantage with $p=60$ (besides theoretical contributions not discussed here).
+`B&M` train `QAOA1` on size $12$ instances and benchmark the algorithm for size up to $20$ for different `k-SAT` problems. They compared their results for `8-SAT` to `WalkSAT` and found a slight quantum advantage with $p=60$ (besides theoretical contributions they made not discussed here).
 
 Specifically, we see the exponent reduce from $0.0214$ to $0.0124$ for $p=14$ ($0.0057$ to $0.0023$), consistent with a quadratic reduction in the runtime and therefore greatly enhancing quantum advantage. 
 
