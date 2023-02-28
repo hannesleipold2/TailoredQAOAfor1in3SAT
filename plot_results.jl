@@ -212,8 +212,10 @@ function gen_plots(train_nbits, clen, mclauses, kinsts, pdepth, DPI=100)
 	exp_fit2 = curve_fit(ExpFit, flatten_nbits_per_inst, flatten_succ_per_inst)
 	println(exp_fit2)
 
-
-	# Plots.plot!(xlim=0, ylim=1.0, legend=:bottomleft)
+	Plots.plot!(ylim=(-0.5,0.0), legend=:bottomleft)
+	if pdepth == 60
+		Plots.plot!(ylim=(-0.1,0.0), legend=:bottomleft)
+	end
 	Plots.plot!(dpi=DPI)
 	DO_SAVE = 1
 	if DO_SAVE == 1
@@ -244,8 +246,8 @@ function gen_plots(train_nbits, clen, mclauses, kinsts, pdepth, DPI=100)
 	=#
 end 
 
-# gen_plots(12, 3, 4, 100, 14, 300)
-# gen_plots(12, 3, 4, 100, 60, 300)
+gen_plots(12, 3, 4, 100, 14, 300)
+gen_plots(12, 3, 4, 100, 60, 300)
 
-gen_plots(12, 3, 4, 100, 14, 100)
-gen_plots(12, 3, 4, 100, 60, 100)
+# gen_plots(12, 3, 4, 100, 14, 100)
+#  gen_plots(12, 3, 4, 100, 60, 100)
