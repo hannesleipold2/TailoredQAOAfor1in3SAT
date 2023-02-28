@@ -1,3 +1,3 @@
-include("cuda/tqaoa_cuda.jl")
+include("tqaoa.jl")
 
 @time train_general_qaoa(12, 3, Int(ceil(12/3)), 100)
