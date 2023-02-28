@@ -1,6 +1,6 @@
 # Increasing Quantum Advantage with Tailored QAOA for 1-in-3 SAT
 
-## Project Overview 
+# Project Overview 
 
 Everyone knows that a suit from a tailor cannot be compared to a suit made off the rack. Tailored algorithms can also be made to perfectly fit problems.  
 
@@ -18,7 +18,17 @@ Other contributions from our work:
 - Early versions of `GPU` and `CPU` optimized code for such tasks.
 - Exploration of an understudied class of optimization problems mendable to Quantum Advantage
 
-## Proposal Details
+# Table of contents
+1. [Proposal Details](#propdets)
+2. [QAOA1](#qaoa1)
+3. [Tailored QAOA](#qaoa2)
+4. [Angle Optimization](#optim)
+5. [Benchmarks](#benchmarks)
+6. [Future Works](#futwork)
+7. [References](#refs)
+
+
+## Proposal Details <a name="propdets"></a>
 
 This Hackathon is work for a future publication based in part on the results gathered here. Our project is about benchmarking an exciting tailored Quantum Alternating Operator Ansatz (`QAOA`)[[1]](#1) approach for solving `1-in-3 SAT`. 
 
@@ -32,7 +42,7 @@ Primarily, we will train our `QAOA` and `QAOA1` on instances of size `12` within
 
 We also use a brute-force solver to find the entire solution space and generate a collection of `1-in-3 SAT` instances in `JSON` that holds essential information about the instances to be able to benchmark our approach. 
 
-# Quantum Approximate Optimization Algorithm for 1-in-3 SAT
+# Quantum Approximate Optimization Algorithm for 1-in-3 SAT <a name="qaoa1"></a>
 
 Here we describe `QAOA1` at a high level. Let $\sigma^{0} =(1/2)(Id + \sigma^{z})$, $\sigma^{1} = (1/2)(Id - \sigma^{z})$, and $\alpha, \beta \in \[ 0, 2  \pi \]^{p}$. Then:
 
@@ -68,7 +78,7 @@ And so the final wavefunction is:
 ```
 
 
-# Tailored Quantum Alternating Operator Ansatz for 1-in-3 SAT
+# Tailored Quantum Alternating Operator Ansatz for 1-in-3 SAT <a name="qaoa"></a>
 
 Here we describe our approach at a high level. Given `m` clauses $C = \{ C_{1}, \ldots, C_{m} \}$ over `n` variables $x_{1}, \ldots, x_{n}$, we find the `maximum disjoint set` of clauses over the `n` variables. 
 
@@ -96,7 +106,7 @@ Then the overall `mixing operator` is:
 ```
 
 
-# Angle Optimizations over Instances
+# Angle Optimizations over Instances <a name="optim"></a>
 
 With instances of size $12$, we optimize the angles of both approaches in two rounds for `p` set to $14$ and $60$ (following `B&M`).
 - Sweep over different starting values for overall coefficient `a` and `b` (10 each) and two choices for evolving
@@ -106,7 +116,7 @@ With instances of size $12$, we optimize the angles of both approaches in two ro
 - Take the best and run `50000` rounds of gradient descent
 
 
-# 1-in-3 SAT 
+# 1-in-3 SAT <a name="1in3sat"></a>
 
 Given a collection of `m` clauses, each with $3$ literals, we wish to find an assignment to all `n` variables such that one and exactly one of the literals in each clause is satisfied. So $1$ literal is satisfied and $2$ are unsatisfied for each clause in the collection. 
 
@@ -115,7 +125,7 @@ Given a collection of `m` clauses, each with $3$ literals, we wish to find an as
 
 The [transition](https://www.researchgate.net/publication/2400280_The_phase_transition_in_1-in-k_SAT_and_NAE_3-SAT) [[5]](#5) from likely to be satisfiable to likely to be unsatisfiable for random `1-in-k` SAT problems occurs with $n/{k \choose 2}$ clauses. For random  `1-in-3` SAT, this occurs with `n/3` clauses. 
 
-# Benchmarks
+# Benchmarks <a name="benchmarks"></a>
 
 We benchmark `QAOA1` and our approach with $p=14$ and $p=60$, following `B&M`, from size $12$ and $21$ with $100$ random instances drawn with $n/3$ clauses and $3$ variables per clause.
 
@@ -125,30 +135,23 @@ Our $p=14$ results show strong performance from both approaches and a soft decay
 
 ![small_plot_pdepth14](./plots/small_plot_succ_vs_nbits_pdepth=14.png)
 
-Fitting an exponential curve on the data with `CurveFit.jl` shows `QAOA` grows as $e^{0.11}$ while `tQAOA` grows as $e^{0.11}$.
+Fitting an exponential curve on the data with `CurveFit.jl` shows `QAOA` grows as $(0.88)e^{(0.0214)n}$ while `tQAOA` grows as $(0.89)e^{(0.124)n}$.
 
 ## p = 60 QAOA vs Tailored QAOA
 
-Our $p=60$ results show expected s tronger performance from both approaches over $p=14$. In this plot, we label `QAOA1` as `green` and our tailored approach (`tQAOA`) as `blue`. We see a significant uplift from the tailoring!
+Our $p=60$ results show expected stronger performance from both approaches over $p=14$. In this plot, we label `QAOA1` as `green` and our tailored approach (`tQAOA`) as `blue`. We see a significant uplift from the tailoring!
 
 ![small_plot_pdepth60](./plots/small_plot_succ_vs_nbits_pdepth=60.png)
 
-Fitting an exponential curve on the data shows `QAOA` grows as $e^{0.11}$ while `tQAOA` grows as $e^{0.11}$.
+Fitting an exponential curve on the data shows `QAOA` grows as $(0.94)e^{(0.0057)n}$ while `tQAOA` grows as $(0.97)e^{(0.0023)n}$.
 
 
-## Search Space with Probelm Size
 
-We expect an important contribution to the improved runtime of our approach is due to the smaller search space. Here we show a plot of how the search space grows for both approaches.
-
-![plot_size](./plots/plot_succ_vs_nbits_pdepth=60_small.png)
-
-Fitting an exponential curve on the data shows `QAOA` grows as $e^{0.11}$ while `tQAOA` grows as $e^{0.11}$.
-
-# Future Work
+# Future Work <a name="futwork"></a>
 
 While our focus was on `1-in-3 SAT` during this Hackathon, our code is easily amendable to exploring the same patterns for `1-in-k SAT` problems with different $k$. While our code in `CUDA` works, it requires special optimization to improve and is an exciting direction to push our experiments further. 
 
-## References
+# References <a name="refs"></a>
 
 <a id="1">[1]</a> 
 Hadfield, S., Wang, Z., O’gorman, B., Rieffel, E. G., Venturelli, D., & Biswas, R. (2019). 
