@@ -105,6 +105,7 @@ Then the overall `mixing operator` is:
     U_{\text{mixer}}(\beta_{l}) = U_{\text{D}}(\beta_{l}) U_{\text{D}}(\beta_{l})
 ```
 
+The initial state is then a uniform superposition overall disjoint clauses, which is easy to prepare. Thus reducing the search space significantly with the tailored ansatz. 
 
 # Angle Optimizations over Instances <a name="optim"></a>
 
