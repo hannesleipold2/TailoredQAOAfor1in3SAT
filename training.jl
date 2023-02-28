@@ -270,16 +270,6 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=500, num_epochs
 														curr_alphas, curr_betas, [ all_sol_vecs[ cost_id ] for cost_id in cost_ids ], num_bits, num_states)
 					push!(grads, appro_grad)
 				end
-				## EVAL ##
-				for k = 1 : kinsts
-					num_bits 			= all_num_bits[ k ]
-					num_states			= 2^(num_bits)
-					ind_id 				= bit_to_ind[ num_bits ]
-					fin_eng, fin_sup 	= run_ut_qaoa(all_wave_funcs[ ind_id ], all_costop_vecs[ k ], all_U_xmixers[ ind_id ], pdepth, 
-													curr_alphas, curr_betas, all_sol_vecs[ k ], num_bits, num_states)
-					avg_fin_eng 		+= fin_eng/kinsts
-					avg_fin_sup 		+= fin_sup/kinsts
-				end
 				if avg_fin_eng < best_avg_fin_eng
 					best_avg_fin_eng 	= avg_fin_eng 
 					best_avg_fin_sup 	= avg_fin_sup
@@ -292,12 +282,12 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=500, num_epochs
 			end
 		end
 	end
-	println(best_alphas)
-	println(best_betas)
-	println(best_avg_fin_eng)
-	println(best_avg_fin_sup)
-	println(best_num_alpha)
-	println(best_num_beta)
+	println("BEST ALPHAS: ", best_alphas)
+	println("BEST BETAS: ", best_betas)
+	println("BEST FIN ENG: ", best_avg_fin_eng)
+	println("BEST FIN SUP: ", best_avg_fin_sup)
+	println("BEST A NUM: ", best_num_alpha)
+	println("BEST B NUM: ", best_num_beta)
 	println(BEST_CHOICE)
 	###		SAVE		###
 	res_params		= AngleParams(pdepth, best_avg_fin_eng, best_avg_fin_sup, num_epochs, num_runs, epoch_engs, epoch_sups, best_alphas, best_betas)
@@ -327,7 +317,9 @@ function train_t_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=10000, num_epoch
 	all_num_bits	= [ sat_probs[ i ].num_red_variables 									for i = 1 : kinsts ]
 	all_num_states 	= [ 2^(all_num_bits[ i ]) 												for i = 1 : kinsts ]
 	all_clauses 	= [ sat_probs[ i ].red_clauses 											for i = 1 : kinsts ]
-	
+	all_dis_clauses = [ sat_probs[ i ].red_max_disjoint_clauses 							for i = 1 : kinsts ] 
+	all_uncov_vars	= [ sat_probs[ i ].red_variables_uncovered								for i = 1 : kinsts ] 
+
 	curr_clause_mixer 	= SparseMatrixCSC{Complex{Float64}, Int64}()
 	curr_wfunc			= SparseArrays{Complex{Float64}}() 
 	curr_costop			= SparseArrays{Complex{Float64}}()
@@ -384,6 +376,8 @@ function train_t_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=10000, num_epoch
 						avg_fin_eng, avg_fin_sup = apply_epoch(curr_alphas, curr_betas)
 						push!(epoch_engs, avg_fin_eng)
 						push!(epoch_sups, avg_fin_sup)
+						println(avg_fin_eng)
+						println(avg_fin_sup)
 					end
 					rand_id 	= rand(1:kinsts)
 					num_bits 	= all_num_bits[ rand_id ]
@@ -395,7 +389,7 @@ function train_t_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=10000, num_epoch
 						end
 					end
 					### GEN WV, COST, MIXER ###
-					curr_wfunc			= 0
+					curr_wfunc			= init_t_wavefunc(num_states, reds_to_acts)
 					curr_costop			= 0 
 					curr_clause_mixer 	= 0 
 					appro_grad 			= simple_param_shift(curr_wfunc, [ all_costop_vecs[ cost_id ] for cost_id in cost_ids ], all_U_clause_mixers[ ind_id ], pdepth, 

@@ -65,6 +65,7 @@ function simple_run_t_qaoa(new_sat_prob)
 	vars_per_clause = new_sat_prob.vars_per_clause 
 	clauses         = new_sat_prob.red_clauses
 	dis_clauses 	= new_sat_prob.red_max_disjoint_clauses
+	rem_clauses 	= new_sat_prob.red_remaining_clauses 
 	uncov_vars		= new_sat_prob.red_variables_uncovered
 	### DEFI ###
 	num_states      = 2^(num_bits)
@@ -75,8 +76,8 @@ function simple_run_t_qaoa(new_sat_prob)
 	# println(find_num_tailor_states(dis_clauses, uncov_vars))
 	# println(length(reds_to_acts))
 	# breakhere!()
-	wave_func 		= init_t_wavefunc(num_states, reds_to_acts) 
-	costop_vec  	= init_cost_oper(num_bits, clauses)
+	wave_func 		= init_t_wavefunc(num_states, reds_to_acts)
+	costop_vec  	= init_cost_oper(num_bits, rem_clauses)
 	U_clause_mixers	= init_clause_mixers(num_bits, reds_to_acts, sols_per_clause, uncov_vars)
 	### CALL ###
 	return run_t_qaoa(wave_func, costop_vec, U_clause_mixers, p_rounds, alphas, betas, sol_vecs, num_bits, num_states)
@@ -143,7 +144,7 @@ function run_general_qaoa(nbits, clen, mclauses, kinsts)
 	return 0 
 end
 
-function train_general_qaoa(nbits, clen, mclauses, kinsts, RUN_OPT=1)
+function train_and_run_qaoa(nbits, clen, mclauses, kinsts, RUN_OPT=1)
 	upp_dir_str = string("./sat_1in", clen, "/")
 	dir_str = string(upp_dir_str, "rand_insts", "_nbits=", nbits, "_mclauses=", mclauses, "_kinsts=", kinsts, "/")
 	new_sat_probs = Array{SatProblem, 1}()
@@ -157,13 +158,15 @@ function train_general_qaoa(nbits, clen, mclauses, kinsts, RUN_OPT=1)
 	if 		RUN_OPT == 1
 		train_ut_qaoa(new_sat_probs)
 	elseif 	RUN_OPT == 2
+		train_t_qaoa(new_sat_probs)
+	elseif 	RUN_OPT == 3
 		simple_run_t_qaoa(new_sat_probs[ 1 ])
 	end
 	return 0 
 end
 
 # run_general_qaoa(12, 3, Int(ceil(12/3)), 100)
-@time train_general_qaoa(12, 3, Int(ceil(12/3)), 100, 1)
+@time train_and_run_qaoa(12, 3, Int(ceil(12/3)), 100, 2)
 
 
 
