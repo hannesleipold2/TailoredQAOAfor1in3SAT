@@ -1,6 +1,7 @@
 using Random 
 using Dates
-using JSON 
+using JSON
+using CUDA 
 include("apply_operators_cuda.jl")
 include("sat_problem_cuda.jl")
 
@@ -164,7 +165,7 @@ function init_alphas_n_betas(pdepth, alpha_co, beta_co, INIT_CHOICE=1)
 end
 
 
-function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=10000, num_epochs=10, pdepth=14, batch_size=1)
+function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=1000, num_epochs=10, pdepth=14, batch_size=1)
     ## filter batches to have the same overall reduced size
     unred_num_bits  = sat_probs[ 1 ].num_variables
     num_clauses     = sat_probs[ 1 ].num_clauses
@@ -176,8 +177,8 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=10000, num_epoc
     bit_to_ind      = Dict([ all_snum_bits[ i ] => i for i = 1 : length(all_snum_bits) ])
     ###     SET-UP      ###
     println(all_snum_bits)
-    all_U_xmixers   = [ Array{SparseMatrixCSC{Complex{Float64}, Int64}, 1}()    for i = 1 : length(bit_to_ind) ]
-    all_wave_funcs  = [ Array{Complex{Float64}, 1}()                            for i = 1 : length(bit_to_ind) ]
+    all_U_xmixers   = [ Array{CUSPARSE.CuSparseMatrixCSC{Complex{Float64}, Int32}, 1}()     for i = 1 : length(bit_to_ind) ]
+    all_wave_funcs  = [ CuVector{ComplexF64}()                                                   for i = 1 : length(bit_to_ind) ]
     for i = 1 : length(all_snum_bits)
         all_U_xmixers[ i ]      = init_xmixers(all_snum_bits[ i ])
         all_wave_funcs[ i ]     = init_ut_wavefunc(2^(all_snum_bits[ i ]))
