@@ -8,7 +8,7 @@ Following recent results obtained with the Quantum Approximate Optimization Algo
 
 `B&M` train `QAOA1` on size $12$ instances and benchmark the algorithm for size up to $20$ for different `k-SAT` problems. They compared their results for `8-SAT` to `WalkSAT` and found a slight quantum advantage with $p=60$ (besides theoretical contributions they made not discussed here).
 
-Specifically, we see the exponent reduce from $0.0214$ to $0.0124$ for $p=14$ ($0.0057$ to $0.0023$ for $p=60$), consistent with a quadratic reduction in the runtime and therefore greatly enhancing quantum advantage. 
+Specifically, we see the exponent reduce from $0.0214$ to $0.0124$ for $p=14$ ($0.0057$ to $0.0023$ for $p=60$), consistent with a quadratic reduction in the runtime and therefore greatly enhancing quantum advantage. (Check out [Benchmarks](#benchmarks)!)
 
 Other contributions from our work:
 - A testbed of `1-in-3 SAT` instances varying from size $12$ to $21$.
@@ -128,6 +128,8 @@ The [transition](https://www.researchgate.net/publication/2400280_The_phase_tran
 # Benchmarks <a name="benchmarks"></a>
 
 We benchmark `QAOA1` and our approach with $p=14$ and $p=60$, following `B&M`, from size $12$ and $21$ with $100$ random instances drawn with $n/3$ clauses and $3$ variables per clause.
+
+Check-out `plots` for higher resolution plots!
 
 ## p = 14 QAOA vs Tailored QAOA
 
