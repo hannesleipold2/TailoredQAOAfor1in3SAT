@@ -163,7 +163,7 @@ function train_general_qaoa(nbits, clen, mclauses, kinsts, RUN_OPT=1)
 end
 
 # run_general_qaoa(12, 3, Int(ceil(12/3)), 100)
-@time train_general_qaoa(12, 3, Int(ceil(12/3)), 100, 2)
+@time train_general_qaoa(12, 3, Int(ceil(12/3)), 100, 1)
 
 
 

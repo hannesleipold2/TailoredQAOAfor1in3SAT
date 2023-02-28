@@ -162,7 +162,7 @@ function init_alphas_n_betas(pdepth, alpha_co, beta_co, INIT_CHOICE=1)
 end
 
 
-function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=10000, num_epochs=10, pdepth=14, batch_size=1)
+function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=500, num_epochs=10, pdepth=14, batch_size=20)
 	## filter batches to have the same overall reduced size
 	unred_num_bits 	= sat_probs[ 1 ].num_variables
 	num_clauses 	= sat_probs[ 1 ].num_clauses
@@ -205,7 +205,7 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=10000, num_epoc
 	
 	### 	RUN 		###
 	SHIFT_SIZE 		= 0.005
-	GRAD_COEF 		= 0.05 
+	GRAD_COEF 		= 0.20 
 	epoch_engs 		= Array{Float64, 1}()
 	epoch_sups 		= Array{Float64, 1}()
 	best_alphas		= [ 0.0 for i = 1 : pdepth ]
