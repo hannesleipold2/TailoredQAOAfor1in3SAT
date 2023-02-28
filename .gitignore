@@ -3,3 +3,4 @@ j*.jl
 *.jl.*.cov
 *.jl.mem
 *.txt
+slides.md

@@ -19,14 +19,7 @@ end
 
 
 function phase_energy!(wave_func, costop_vec, alpha)
-    #if length(wave_func) != length(costop_vec)
-    #    println("unmatch cost and wave funcs ", length(wave_func), " ", length(costop_vec))
-    #    throw(DimensionMismatch)
-    #end
     wave_func = cuda_exp( 1.0im * costop_vec) * wave_func
-    #for i = 1 : length(costop_vec)
-    #    wave_func[i] *= exp(1.0im * alpha * costop_vec[i]) 
-    #end
     nothing 
 end
 
@@ -66,18 +59,6 @@ function apply_all_xmixers(wave_func::CuArray{Complex{Float64}, 1}, copy_wave_fu
     num_states = 2^(num_bits)
     for i = 1 : num_bits
         wave_func = wave_func + (Complex{Float64}(exp(-1.0im * pi * beta) - 1) * U_xmixers[ i ] * wave_func)
-        # copytontt!(wave_func, U_xmixers[i] * wave_func)
-        # println(dot((U_xmixers[ i ] * copy_wave_func), wave_func))
-        # wave_func *= Complex{Float64}(exp(-1.0im * pi * beta) - 1.0)
-        # println(wave_func)
-        # println((Complex{Float64}(exp(-1.0im * pi * beta) - 1) * U_xmixers[ i ] * copy_wave_func))
-        # println(dot((Complex{Float64}(exp(-1.0im * pi * beta) - 1) * U_xmixers[ i ] * copy_wave_func), wave_func))
-        # println(norm(wave_func))
-        # copytontt!(wave_func, copy_wave_func + wave_func)
-        # copytontt!(copy_wave_func, wave_func)
-        # println(norm(wave_func))
-        # println(norm(copy_wave_func))
-        # breakhere!()
     end
     return wave_func 
 end
@@ -88,14 +69,10 @@ function apply_all_clause_mixers(wave_func::CuVector{Complex{Float64}, Int32}, c
     for i = 1 : length(U_clause_mixers)
         before_nnz = nnz(wave_func)
         wave_func = wave_func + (Complex{Float64}(exp(-1.0im * pi * beta) - 1) * U_clause_mixers[ i ] * wave_func)
-        # wave_func = U_xmixers[i] * wave_func
-        # wave_func *= Complex{Float64}(exp(-1.0im * pi * beta) - 1)
-        # wave_func = copy_wave_func + wave_func
-        # copyto!(copy_wave_func, wave_func)
         after_nnz = nnz(wave_func)
         if after_nnz > before_nnz
             println(after_nnz, " ", before_nnz)
-            breakhere!()
+            throw(DimensionMismatch)
         end
     
     end

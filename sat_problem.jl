@@ -72,19 +72,14 @@ module SatGenerator
 	function gen_sat_clause(nbits, mclauses, clen)
 		clauses = Array{Array{Literal, 1}, 1}()
 		for cl_id = 1 : mclauses
-			clause = Array{Literal, 1}()
+			clause 	= Array{Literal, 1}()
 			for var_id = 1 : clen
 				id_r_ng = rand(0:1)
 				bit_loc = rand(1:nbits)
 				push!(clause, Literal(bit_loc, id_r_ng))
 			end
-			# println(clause)
-			# println(clauses)
 			push!(clauses, clause)
 		end
-		# println()
-		# breakhere!()
-		# println(clauses)
 		return clauses 
 	end
 
@@ -106,7 +101,7 @@ module SatGenerator
 			end
 		else
 			println("PROBLEM")
-			breakhere!()
+			throw(DomainError)
 		end
 		return 1 
 	end
@@ -157,7 +152,7 @@ module SatGenerator
 		for lit_id = 1 : length(clauses[curr_clause_id])
 			var_id = clauses[curr_clause_id][lit_id].variable
 			if var_id in curr_var_cover
-				 clause_conflict = 1
+				clause_conflict = 1
 			end
 		end
 		if clause_conflict == 0
@@ -180,6 +175,7 @@ module SatGenerator
 		candidate_clause_ids 	= Array{Int64, 1}()
 		var_cover 				= Set{Int64}()
 		best_clause_ids 		= [  deepcopy(candidate_clause_ids) ]
+		best_clause_cover		= Set{Int64}()
 		rec_max_disjoint_clauses(nbits, clauses, start_clause_id, candidate_clause_ids, var_cover, best_clause_ids)
 		# println(best_clause_ids)
 		return best_clause_ids[1]
@@ -270,26 +266,6 @@ module SatGenerator
 		red_solutions 		= SatGenerator.all_sat_sols(red_bits, red_clauses)
 		red_uncoved_vars	= SatGenerator.find_unused_variable(red_bits, red_dis_clauses)
 		num_red_uncoved_bits= length(red_uncoved_vars)
-		#=
-		struct SatProblem
-			num_variables::Int64 
-			num_clauses::Int64
-			vars_per_clause::Int64
-			num_red_variables::Int64
-			num_red_uncov_variables::Int64 
-			clauses::Array{Array{Literal, 1}, 1}
-			max_disjoint_clauses::Array{Array{Literal, 1}, 1}
-			remaining_clauses::Array{Array{Literal, 1}, 1}
-			red_clauses::Array{Array{Literal, 1}, 1}
-			red_max_disjoint_clauses::Array{Array{Literal, 1}, 1}
-			red_remaining_clauses::Array{Array{Literal, 1}, 1}
-			red_solutions::Array{Array{Int64, 1}, 1}
-			variables_unused::Array{Int64, 1}
-			red_variables_uncovered::Array{Int64, 1}
-			var_to_reduced::Dict{Int64, Int64}
-			reduced_to_var::Dict{Int64, Int64}
-		end		
-		=#
 		function lit_to_tuple(lit)
 			return (lit.variable, lit.expected_value)
 		end
@@ -315,7 +291,6 @@ module SatGenerator
 									,	red_uncoved_vars
 									,	vars_to_red
 									,	red_to_vars)
-		breakhere!()
 		push!(all_unused, length(unused_vars))
 		push!(all_uncov, length(uncoved_vars) - length(unused_vars))
 		push!(sat_insts, sat_inst) 

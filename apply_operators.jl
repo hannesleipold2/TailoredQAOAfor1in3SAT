@@ -14,6 +14,19 @@ function phase_energy!(wave_func, costop_vec, alpha)
 	nothing 
 end
 
+function phase_subspace_energy!(wave_func, costop_vec, reds_to_acts, alpha)
+	if length(wave_func) != length(costop_vec)
+		println("unmatch cost and wave funcs ", length(wave_func), " ", length(costop_vec))
+		throw(DimensionMismatch)
+	end
+	for i = 1 : length(reds_to_acts)
+		wave_func[ reds_to_acts[ i ] ] *= exp(1.0im * alpha * costop_vec[ reds_to_acts[ i ] ]) 
+	end
+	nothing 
+end
+
+
+
 function apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_xmixer::SparseMatrixCSC{Complex{Float64}, Int64}, num_bits, beta)
 	num_states = 2^(num_bits)
 	for i = 1 : num_bits
@@ -50,18 +63,6 @@ function apply_all_xmixers(wave_func::Array{Complex{Float64}, 1}, copy_wave_func
 	num_states = 2^(num_bits)
 	for i = 1 : num_bits
 		wave_func = wave_func + (Complex{Float64}(exp(-1.0im * pi * beta) - 1) * U_xmixers[ i ] * wave_func)
-		# copytontt!(wave_func, U_xmixers[i] * wave_func)
-		# println(dot((U_xmixers[ i ] * copy_wave_func), wave_func))
-		# wave_func *= Complex{Float64}(exp(-1.0im * pi * beta) - 1.0)
-		# println(wave_func)
-		# println((Complex{Float64}(exp(-1.0im * pi * beta) - 1) * U_xmixers[ i ] * copy_wave_func))
-		# println(dot((Complex{Float64}(exp(-1.0im * pi * beta) - 1) * U_xmixers[ i ] * copy_wave_func), wave_func))
-		# println(norm(wave_func))
-		# copytontt!(wave_func, copy_wave_func + wave_func)
-		# copytontt!(copy_wave_func, wave_func)
-		# println(norm(wave_func))
-		# println(norm(copy_wave_func))
-		# breakhere!()
 	end
 	return wave_func 
 end
@@ -70,25 +71,7 @@ end
 function apply_all_clause_mixers(wave_func::SparseVector{Complex{Float64}, Int64}, copy_wave_func::SparseVector{Complex{Float64}, Int64}, U_clause_mixers::Array{SparseMatrixCSC{Complex{Float64}, Int64}, 1}, num_bits, beta)
 	num_states = 2^(num_bits)
 	for i = 1 : length(U_clause_mixers)
-		# before_nnz 	= nnz(wave_func)
-		# wi1, wv1 	= findnz(wave_func)
 		wave_func 	= wave_func + (Complex{Float64}(exp(-1.0im * pi * beta) - 1) * U_clause_mixers[ i ] * wave_func)
-		# wave_func = U_xmixers[i] * wave_func
-		# wave_func *= Complex{Float64}(exp(-1.0im * pi * beta) - 1)
-		# wave_func = copy_wave_func + wave_func
-		# copyto!(copy_wave_func, wave_func)
-		# after_nnz 	= nnz(wave_func)
-		# Ui, Uj, Uv 	= findnz(U_clause_mixers[ i ])
-		# wi2, wv2 	= findnz(wave_func) 
-		#=
-		if after_nnz > before_nnz
-			println(setdiff(wi2, wi1))
-			println(setdiff(Ui, wi1))
-			println(setdiff(Uj, wi1))
-			println(after_nnz, " ", before_nnz)
-			breakhere!()
-		end
-		=# 
 	end
 	return wave_func 
 end

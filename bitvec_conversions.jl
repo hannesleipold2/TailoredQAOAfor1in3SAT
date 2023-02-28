@@ -19,7 +19,7 @@ function int_to_bit_vec(int_val::Int, bit_length::Int)
     if int_val > 2^(bit_length)
         println("val larger than num bits allows")
         println(int_val)
-        breakhere!()
+        throw(DomainError)
     end
     outvec      = zeros(Int64, bit_length)
     curr_int    = int_val - 1

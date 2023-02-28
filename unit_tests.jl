@@ -39,15 +39,8 @@ function apply_new_xmixer!(wave_func::Array{Complex{Float64}, 1}, num_bits, beta
 
 		a = dot(before_ket0_at_i, wave_func)
 		b = dot(before_ket1_at_i, wave_func)
-		# println(norm(a))
-		# println(norm(b))
-		# println(a)
-		# println(b)
 		copyto!(wave_func, ((a * cos(beta)) + (b * 1.0im * sin(beta))) * (before_ket0_at_i/norm(before_ket0_at_i)))
-		# println(norm(wave_func))
 		wave_func += ((a * 1.0im * sin(beta)) + (b * cos(beta))) * (before_ket1_at_i/norm(before_ket1_at_i))
-		# println(norm(wave_func))
-		# breakhere!()
 		for j = 1 : num_states
 			if int_to_bit_vec(j, num_bits)[i] == 0
 				before_ket0_at_i[j] = 0
@@ -56,7 +49,6 @@ function apply_new_xmixer!(wave_func::Array{Complex{Float64}, 1}, num_bits, beta
 			end
 		end
 	end
-	# println("NORM: ", norm(wave_func))
 	return nothing 
 end
 
@@ -76,13 +68,6 @@ function apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatr
 			U_trans[j2, j ] = Complex{Float64}(-1.0im * sin(beta))
 			U_trans[j2, j2] = Complex{Float64}(cos(beta))
 		end
-		# tmp_func = copy(wave_func)
-		# e^(Ix) = cos(x) + I * sin(x)
-		# wave_func = Complex{Float64}(exp(-1.0im * pi * beta)) * U_trans * wave_func
-		# println(wave_func)
-		# Base.print_matrix(stdout, U_trans)
-		# println()
-		# wave_func = tmp_func - U_trans * tmp_func + wave_func
 		wave_func2 = U_trans * wave_func
 		### CLEAR MATRIX ###
 		for j = 1 : num_states
@@ -97,7 +82,6 @@ function apply_xmixer(wave_func::Array{Complex{Float64}, 1}, U_trans::SparseMatr
 		end
 		dropzeros!(U_trans)
 	end
-	# breakhere!()
 	return wave_func
 end
 
@@ -125,9 +109,6 @@ function unit_tester(num_bits)
 		println(Dates.now() - iter_time)
 		println("NORM 2: ", norm(wave_func))
 		println(dot(wave_func, wave_func2))
-		# println(wave_func)
-		# println(wave_func2)
-		# breakhere!()
 		end_time  = Dates.now()
 		delta_time= end_time - iter_time
 		if (i-1)%(round(NUM_RUNS/10)) == 0

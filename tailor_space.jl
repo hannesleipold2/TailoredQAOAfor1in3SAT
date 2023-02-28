@@ -15,11 +15,24 @@ function find_sols_per_clause(num_bits, clauses)
 					num_sat += 1
 				end
 			end
+			var_dict = Dict()
+			is_consistent_sol = 1
+			for i = 1 : length(clause)
+				if vars[ i ] in keys(var_dict) && pot_sol[ i ] != var_dict[ vars[ i ] ]
+					is_consistent_sol = 0
+					break
+				else
+					var_dict[ vars[ i ] ] = pot_sol[ i ]
+				end
+			end
+			if is_consistent_sol == 0
+				continue
+			end
 			if num_sat == 1 
-				push!(clause_sol, [ [ vars[ i ], pot_sol[ i ] ] for i = 1 : length(clause) ])
+				push!(clause_sol, sort!([ [ vars[ i ], pot_sol[ i ] ] for i = 1 : length(clause) ]))
 			end
 		end
-		push!(sols, clause_sol)
+		push!(sols, collect(Set(clause_sol)))
 	end
 	return sols
 end 
@@ -35,22 +48,28 @@ function rec_tailor_subspace(curr_config, reds_to_acts, state_cntp, sols_per_cl,
 			for i = 1 : num_bits
 				if ret_vec[i] < 0
 					println(ret_vec)
+					println(num_bits)
+					println(uncov_id)
+					println(uncov_vars)
 					throw(DomainError)
 				end
 			end
-			# println(ret_vec)
 			ret_int                         = bit_vec_to_int(ret_vec)
-			state_cntp[ 1 ]                 = state_cntp[ 1 ] + 1
-			reds_to_acts[ state_cntp[ 1 ] ] = ret_int 
-		else
-			for var in uncov_vars
-				push!(curr_config, [ var, 0 ])
-				rec_tailor_subspace(curr_config, reds_to_acts, state_cntp, sols_per_cl, uncov_vars, num_bits, cl_id, uncov_id+1)
-				pop!(curr_config)
-				push!(curr_config, [ var, 1 ])
-				rec_tailor_subspace(curr_config, reds_to_acts, state_cntp, sols_per_cl, uncov_vars, num_bits, cl_id, uncov_id+1)
-				pop!(curr_config)		
+			if ret_int < 1
+				println(ret_int)
+				println(ret_vec)
+				throw(DomainError)
 			end
+			state_cntp[ 1 ]                 = state_cntp[ 1 ] + 1
+			push!(reds_to_acts, ret_int) 
+		else
+			var = uncov_vars[ uncov_id ]
+			push!(curr_config, [ var, 0 ])
+			rec_tailor_subspace(curr_config, reds_to_acts, state_cntp, sols_per_cl, uncov_vars, num_bits, cl_id, uncov_id+1)
+			pop!(curr_config)
+			push!(curr_config, [ var, 1 ])
+			rec_tailor_subspace(curr_config, reds_to_acts, state_cntp, sols_per_cl, uncov_vars, num_bits, cl_id, uncov_id+1)
+			pop!(curr_config)
 		end
 	else 
 		for sol_id = 1 : length(sols_per_cl[cl_id])
@@ -130,23 +149,10 @@ function find_tailor_subspace(sat_prob::SatProblem)
 	uncov_vars	= sat_prob.red_variables_uncovered
 	clen        = sat_prob.vars_per_clause
 	sols_per_cl = find_sols_per_clause(num_bits, dis_clauses)
-	reds_to_acts= [ 0 for i = 1 : find_num_tailor_states(dis_clauses, uncov_vars) ]
+	reds_to_acts= Array{Int64, 1}()
 	wave_func  	= spzeros(Complex{Float64}, num_states)   
 	curr_config	= Array{Array{Int64, 1}, 1}()
 	state_cntp  = [ 0 ]
 	rec_tailor_subspace(curr_config, reds_to_acts, state_cntp, sols_per_cl, uncov_vars, num_bits, 1, 1)
-	# println(uncov_vars)
-	# println(sols_per_cl)
-	# println(clauses)
-	# println(wave_func)
-	# println(num_states)
-	# println(nnz(wave_func))
-	# costop_vec = cost_oper(num_bits, dis_clauses)
-	#=
-	for i = 1 : length(reds_to_acts)
-		println(costop_vec[ reds_to_acts[ i ] ])
-	end
-	breakhere!()
-	=# 
 	return reds_to_acts
 end

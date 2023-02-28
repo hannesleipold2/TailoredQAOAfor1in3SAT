@@ -84,7 +84,7 @@ module SatGenerator
             push!(clauses, clause)
         end
         # println()
-        # breakhere!()
+        # throw(DomainError)
         # println(clauses)
         return clauses 
     end
@@ -107,7 +107,7 @@ module SatGenerator
             end
         else
             println("PROBLEM")
-            breakhere!()
+            throw(DomainError)
         end
         return 1 
     end
@@ -316,7 +316,7 @@ module SatGenerator
                                     ,   red_uncoved_vars
                                     ,   vars_to_red
                                     ,   red_to_vars)
-        breakhere!()
+        throw(DomainError)
         push!(all_unused, length(unused_vars))
         push!(all_uncov, length(uncoved_vars) - length(unused_vars))
         push!(sat_insts, sat_inst) 

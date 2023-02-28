@@ -10,6 +10,56 @@ using JSON
 
 include("bitvec_conversions.jl")
 
+function init_subspace_cost_oper(num_bits, clauses, reds_to_acts, red_sols=[])
+	num_states  = 2^(num_bits)
+	costop_vec 	= spzeros(Complex{Float64}, num_states)
+	for i = 1 : length(reds_to_acts)
+		i_bitvec    = int_to_bit_vec(reds_to_acts[ i ], num_bits)
+		i_cost      = 0 
+		for clause in clauses
+			c_cost  = 1
+			for j = 1 : length(clause)
+				do_red_cost = 1
+				for k = 1 : length(clause)
+					if j == k 
+						if i_bitvec[clause[k].variable] != clause[k].expected_value
+							do_red_cost = 0
+						end
+					else
+						if i_bitvec[clause[k].variable] == clause[k].expected_value
+							do_red_cost = 0
+						end
+					end
+				end
+				if do_red_cost == 1
+					c_cost = 0
+				end
+			end
+			i_cost += c_cost 
+		end
+		costop_vec[ reds_to_acts[ i ] ] = i_cost
+	end
+	num_sols = 0
+	for i = 1 : length(reds_to_acts)
+		if costop_vec[ reds_to_acts[ i ] ] == 0
+			num_sols += 1
+		end
+	end
+	if length(red_sols) > 0 && num_sols != length(red_sols)
+		println("Cost-Op num sols don't match known num sols")
+		throw(DomainError)
+	else 
+		for sol in red_sols
+			sol_int = bit_vec_to_int(sol)
+			if costop_vec[sol_int] != 0
+				println("PROBLEM ", sol_int, " ", costop_vec[sol_int])
+				throw(DomainError)
+			end
+		end
+	end
+	return costop_vec
+end
+
 function init_cost_oper(num_bits, clauses, red_sols=[])
 	num_states  = 2^(num_bits)
 	costop_vec  = zeros(Complex{Float64}, num_states)
@@ -97,7 +147,7 @@ function check_cmixer(U_clause_mixers, cl_id, reds_to_acts)
 		println(nnz(U_clause_mixers[cl_id]))
 		println(num_cnt)
 		println(cl_id)
-		breakhere!()
+		throw(DomainError)
 	end
 end
 
@@ -125,33 +175,39 @@ function fill_clause_mixers!(all_U_clause_mixers, num_bits, reds_to_acts, sols_p
 					# println("SKIPPED")
 					continue
 				end
-				all_U_clause_mixers[ cl_id ][ i_val, i_val ] = 1.0/length(sols_per_clause[ cl_id ][ j ])
+				if i_val < 1
+					println(reds_to_acts[ i ])
+					println(i_val, i_val)
+					println(i_vec)
+					throw(DomainError)
+				end
+				all_U_clause_mixers[ cl_id ][ i_val, i_val ] = 1.0/length(sols_per_clause[ cl_id ])
 				for k = 1 : length(sols_per_clause[cl_id])
 					if j == k 
 						continue 
 					end
-					# println(sols_per_clause[cl_id][ j ])
-					# println(sols_per_clause[cl_id][ j ])
-					# println(sols_per_clause[cl_id][ k ])
-					# println(length(sols_per_clause[cl_id]))
-					# println()
 					for l = 1 : length(sols_per_clause[ cl_id ][ j ])
 						i_vec[ sols_per_clause[cl_id][ j ][ l ][ 1 ] ] = sols_per_clause[cl_id][ k ][ l ][ 2 ]
 					end
 					r_val = bit_vec_to_int(i_vec)
-					#=
-					if !(r_val in a_set)
-						println(r_val)
-						println(i_val)
-						println(sols_per_clause[cl_id][ k ])
-						breakhere!()
-					end
-					=# 
-					all_U_clause_mixers[ cl_id ][ i_val, r_val ] = 1.0/length(sols_per_clause[cl_id][ j ])
+					all_U_clause_mixers[ cl_id ][ i_val, r_val ] = 1.0/length(sols_per_clause[cl_id])
+					all_U_clause_mixers[ cl_id ][ r_val, i_val ] = 1.0/length(sols_per_clause[cl_id])
 				end
 			end
 		end 
-		# check_cmixer(all_U_clause_mixers, cl_id, reds_to_acts)
+		Utmp = (SparseMatrixCSC{Complex{Float32}, Int32}(I, num_states, num_states) + Complex{Float32}(exp(1.0im * pi * 0.5) - 1) * all_U_clause_mixers[ cl_id ])
+		if norm(SparseMatrixCSC{Complex{Float32}, Int32}(I, num_states, num_states) - Utmp * adjoint(Utmp)) > 0.00001
+			println("tmp")
+			println(cl_id)
+			println(sols_per_clause[cl_id])
+			println(length(sols_per_clause[cl_id]))
+			println(sols_per_clause)
+			println(length(reds_to_acts)) 
+			println(nnz(all_U_clause_mixers[ cl_id ]))
+			println(norm(SparseMatrixCSC{Complex{Float32}, Int32}(I, num_states, num_states) - Utmp * adjoint(Utmp))) 
+			println(norm(all_U_clause_mixers[ cl_id ] - all_U_clause_mixers[ cl_id ] * all_U_clause_mixers[ cl_id ]))
+			throw(DomainError)
+		end
 	end
 	mat_id = length(sols_per_clause)
 	for i in uncov_vars
@@ -166,16 +222,7 @@ function fill_clause_mixers!(all_U_clause_mixers, num_bits, reds_to_acts, sols_p
 			all_U_clause_mixers[ mat_id ][ j_val , j_val2 ] = Complex{Float64}(1/2)
 			all_U_clause_mixers[ mat_id ][ j_val2, j_val  ] = Complex{Float64}(1/2)
 			all_U_clause_mixers[ mat_id ][ j_val2, j_val2 ] = Complex{Float64}(1/2)
-			#= 
-			if !(j_val2 in a_set)
-				println(j_val)
-				println(j_val2)
-				println(sols_per_clause[cl_id][ k ])
-				breakhere!()
-			end
-			=# 
 		end
-		# check_cmixer(all_U_clause_mixers, mat_id, reds_to_acts)
 	end
 	nothing 
 end
@@ -188,15 +235,26 @@ function init_clause_mixers(num_bits, reds_to_acts, sols_per_clause, uncov_vars)
 	return all_U_clause_mixers
 end
 
+
 function init_sol_space(red_sols, num_states)
+	sol_vecs = Array{Int64, 1}()
+	for i = 1 : length(red_sols)
+		sol_vec = zeros(Complex{Float64}, num_states)
+		push!(sol_vecs, bit_vec_to_int(red_sols[ i ]))
+	end
+	return sol_vecs
+end
+
+function init_full_sol_space(red_sols, num_states)
 	sol_vecs = Array{Array{Complex{Float64}, 1}, 1}()
 	for i = 1 : length(red_sols)
 		sol_vec = zeros(Complex{Float64}, num_states)
-		sol_vec[ bit_vec_to_int(red_sols[ i ]) ] = Float64(1)
+		sol_vec[bit_vec_to_int(red_sols[ i ])] = 1 
 		push!(sol_vecs, sol_vec)
 	end
 	return sol_vecs
 end
+
 
 
 function init_ut_wavefunc(num_states)

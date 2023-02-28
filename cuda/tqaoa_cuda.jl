@@ -71,7 +71,7 @@ function simple_run_t_qaoa(new_sat_prob)
     # println(reds_to_acts)
     # println(find_num_tailor_states(dis_clauses, uncov_vars))
     # println(length(reds_to_acts))
-    # breakhere!()
+    # throw(DomainError)
     wave_func       = init_t_wavefunc(num_states, reds_to_acts) 
     costop_vec      = init_cost_oper(num_bits, clauses)
     U_clause_mixers = init_clause_mixers(num_bits, reds_to_acts, sols_per_clause, uncov_vars)
@@ -138,7 +138,6 @@ function run_general_qaoa(nbits, clen, mclauses, kinsts)
         new_sat_prob = Unmarshal.unmarshal(SatProblem, JSON.parse(json_string))
         # simple_run_ut_qaoa(new_sat_prob)
         simple_run_t_qaoa(new_sat_prob)
-        breakhere!()
     end
     return 0 
 end

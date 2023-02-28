@@ -85,20 +85,10 @@ function simple_param_shift(    wave_func, costop_vecs, U_xmixer, pdepth, alphas
                                 all_sol_vecs, num_bits, num_states, shift_size=0.002, grad_coef=0.010, num_shifts=4, DO_PRINT=0)
     rand_id     = rand(1:pdepth)
     rand_bit    = rand(0:1)
-    # rand_id   = rand(1:pdepth)
-    # rand_bit  = rand(0:1)
-    # println()
     if rand_bit == 1
-        # println("A ", rand_bit)
-        # println("NSHIFT: ", alphas[rand_id])
         alphas[rand_id] += shift_size
-        # println("FSHIFT: ", alphas[rand_id])
     else 
-        # println("B ", rand_bit)
-        # println("NSHIFT: ", betas[rand_id])
         betas[rand_id]  += shift_size
-        # println()
-        # println("FSHIFT: ", betas[rand_id])
     end
     avg_fin_eng1 = 0
     avg_fin_sup1 = 0 
@@ -108,17 +98,9 @@ function simple_param_shift(    wave_func, costop_vecs, U_xmixer, pdepth, alphas
         avg_fin_sup1 += fin_sup1 / length(costop_vecs)
     end
     if rand_bit == 1
-        # println("A ", rand_bit)
-        # println("MSHIFT: ", alphas[rand_id])
-        # println((2 * shift_size))
         alphas[rand_id] -= (2 * shift_size)
-        # println("BSHIFT: ", alphas[rand_id])
     else 
-        # println("B ", rand_bit)
-        # println("MSHIFT: ", betas[rand_id])
-        # println((2 * shift_size))
         betas[rand_id]  -= (2 * shift_size)
-        # println("BSHIFT: ", betas[rand_id])
     end
     avg_fin_eng2 = 0
     avg_fin_sup2 = 0 
@@ -128,20 +110,11 @@ function simple_param_shift(    wave_func, costop_vecs, U_xmixer, pdepth, alphas
         avg_fin_sup2 += fin_sup2 / length(costop_vecs)
     end
     appro_grad = (avg_fin_eng2 - avg_fin_eng1)
-    # println()
-    # println(avg_fin_eng1)
-    # println(avg_fin_eng2)
-    # println(appro_grad)
-    # println()
     if rand_bit == 1
         alphas[rand_id] += shift_size + (grad_coef * appro_grad)
-        # println("NSHIFT: ", alphas[rand_id])
     else 
         betas[rand_id]  += shift_size + (grad_coef * appro_grad)
-        # println("NSHIFT: ", betas[rand_id])
     end
-    # println()
-    # breakhere!()
     return appro_grad
 end
 
@@ -228,22 +201,6 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=1000, num_epoch
             println("SWEEPING: ", i, " ", j)
             for INIT_CHOICE = 1 : NUM_INIT_CHOICES
                 curr_alphas, curr_betas = init_alphas_n_betas(pdepth, alpha_cos[ i ], beta_cos[ j ], INIT_CHOICE)
-                # println(curr_alphas)
-                # println(curr_betas)
-                ## BEFORE OPT ##
-                #=
-                before_fin_eng  = 0
-                before_fin_sup  = 0
-                for k = 1 : kinsts
-                    num_bits            = all_num_bits[ k ]
-                    num_states          = 2^(num_bits)
-                    ind_id              = bit_to_ind[ num_bits ]
-                    fin_eng, fin_sup    = run_ut_qaoa(all_wave_funcs[ ind_id ], all_costop_vecs[ k ], all_U_xmixers[ ind_id ], pdepth, 
-                                                        curr_alphas, curr_betas, all_sol_vecs[ k ], num_bits, num_states)
-                    before_fin_eng      += fin_eng/kinsts
-                    before_fin_sup      += fin_sup/kinsts
-                end
-                =# 
                 ## OPT ##
                 grads       = Array{Float64, 1}()
                 start_time  = Dates.now()
@@ -265,8 +222,6 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=1000, num_epoch
                             delete!(cost_ids, length(cost_ids) - i + 1)
                         end
                     end
-                    # println(cost_ids)
-                    # breakhere!()
                     appro_grad  = simple_param_shift(all_wave_funcs[ ind_id ], [ all_costop_vecs[ cost_id ] for cost_id in cost_ids ], all_U_xmixers[ ind_id ], pdepth, 
                                                         curr_alphas, curr_betas, [ all_sol_vecs[ cost_id ] for cost_id in cost_ids ], num_bits, num_states)
                     push!(grads, appro_grad)
@@ -284,15 +239,6 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=1000, num_epoch
                     avg_fin_eng         += fin_eng/kinsts
                     avg_fin_sup         += fin_sup/kinsts
                 end
-                # println("ENG: \t", before_fin_eng, "\t\t SUP: \t", before_fin_sup)
-                # println("ENG: \t", avg_fin_eng, "\t\t SUP: \t", avg_fin_sup)
-                # println(curr_alphas)
-                # println(curr_betas)
-                # breakhere!()
-                # println(i, " ", j)
-                # println(avg_fin_eng)
-                # println(avg_fin_sup)
-                # println()
                 if avg_fin_eng < best_avg_fin_eng
                     best_avg_fin_eng    = avg_fin_eng 
                     best_avg_fin_sup    = avg_fin_sup
@@ -329,22 +275,6 @@ function train_ut_qaoa(sat_probs::Array{SatProblem, 1}, num_runs=1000, num_epoch
     end
     return 0 
 end
-
-#=
-struct AngleParams
-    pdepth::Int64
-    avg_fin_eng::Float64
-    avg_fin_sup::Float64
-    epoch_num::Float64
-    num_runs::Int64 
-    epoch_engs::Array{Float64, 1}
-    epoch_sups::Array{Float64, 1}
-    alphas::Array{Float64, 1}
-    betas::Array{Float64, 1}
-end
-=#
-
-
 
 
 

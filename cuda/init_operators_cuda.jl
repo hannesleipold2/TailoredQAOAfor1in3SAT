@@ -97,7 +97,7 @@ function check_cmixer(U_clause_mixers, cl_id, reds_to_acts)
         println(nnz(U_clause_mixers[cl_id]))
         println(num_cnt)
         println(cl_id)
-        breakhere!()
+        throw(DomainError)
     end
 end
 
@@ -141,7 +141,7 @@ function fill_clause_mixers!(all_U_clause_mixers, num_bits, reds_to_acts, sols_p
                         println(r_val)
                         println(i_val)
                         println(sols_per_clause[cl_id][ k ])
-                        breakhere!()
+                        throw(DomainError)
                     end
                     all_U_clause_mixers[ cl_id ][ i_val, r_val ] = 1.0/length(sols_per_clause[cl_id][ j ])
                 end
@@ -166,7 +166,7 @@ function fill_clause_mixers!(all_U_clause_mixers, num_bits, reds_to_acts, sols_p
                 println(j_val)
                 println(j_val2)
                 println(sols_per_clause[cl_id][ k ])
-                breakhere!()
+                throw(DomainError)
             end
         end
         check_cmixer(all_U_clause_mixers, cl_id, reds_to_acts)
@@ -176,7 +176,7 @@ function fill_clause_mixers!(all_U_clause_mixers, num_bits, reds_to_acts, sols_p
             println()
             println(nnz(all_U_clause_mixers[ mat_id ]))
             println(length(reds_to_acts)^2)
-            breakhere!()
+            throw(DomainError)
         end
     end
     nothing 

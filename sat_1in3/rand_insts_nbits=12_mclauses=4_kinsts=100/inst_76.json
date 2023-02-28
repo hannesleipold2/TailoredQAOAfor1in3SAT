@@ -3,8 +3,50 @@
     "num_clauses": 4,
     "vars_per_clause": 3,
     "num_red_variables": 7,
-    "num_red_uncov_variables": 3,
+    "num_red_uncov_variables": 2,
     "clauses": [
+        [
+            {
+                "variable": 3,
+                "expected_value": 0
+            },
+            {
+                "variable": 12,
+                "expected_value": 1
+            },
+            {
+                "variable": 3,
+                "expected_value": 0
+            }
+        ],
+        [
+            {
+                "variable": 11,
+                "expected_value": 1
+            },
+            {
+                "variable": 9,
+                "expected_value": 1
+            },
+            {
+                "variable": 6,
+                "expected_value": 0
+            }
+        ],
+        [
+            {
+                "variable": 8,
+                "expected_value": 0
+            },
+            {
+                "variable": 7,
+                "expected_value": 1
+            },
+            {
+                "variable": 6,
+                "expected_value": 0
+            }
+        ],
         [
             {
                 "variable": 9,
@@ -12,79 +54,37 @@
             },
             {
                 "variable": 3,
-                "expected_value": 1
-            },
-            {
-                "variable": 10,
-                "expected_value": 0
-            }
-        ],
-        [
-            {
-                "variable": 4,
-                "expected_value": 1
-            },
-            {
-                "variable": 6,
                 "expected_value": 0
             },
-            {
-                "variable": 6,
-                "expected_value": 0
-            }
-        ],
-        [
-            {
-                "variable": 10,
-                "expected_value": 0
-            },
-            {
-                "variable": 7,
-                "expected_value": 0
-            },
-            {
-                "variable": 7,
-                "expected_value": 1
-            }
-        ],
-        [
             {
                 "variable": 8,
                 "expected_value": 1
-            },
-            {
-                "variable": 6,
-                "expected_value": 0
-            },
-            {
-                "variable": 6,
-                "expected_value": 0
             }
         ]
     ],
     "max_disjoint_clauses": [
         [
             {
-                "variable": 10,
+                "variable": 3,
                 "expected_value": 0
             },
             {
-                "variable": 7,
-                "expected_value": 0
-            },
-            {
-                "variable": 7,
+                "variable": 12,
                 "expected_value": 1
+            },
+            {
+                "variable": 3,
+                "expected_value": 0
             }
         ],
         [
             {
                 "variable": 8,
-                "expected_value": 1
+                "expected_value": 0
             },
             {
-                "variable": 6,
-                "expected_value": 0
+                "variable": 7,
+                "expected_value": 1
             },
             {
                 "variable": 6,
@@ -95,74 +95,74 @@
     "remaining_clauses": [
         [
             {
+                "variable": 11,
+                "expected_value": 1
+            },
+            {
                 "variable": 9,
                 "expected_value": 1
             },
             {
-                "variable": 3,
-                "expected_value": 1
-            },
-            {
-                "variable": 10,
+                "variable": 6,
                 "expected_value": 0
             }
         ],
         [
             {
-                "variable": 4,
+                "variable": 9,
                 "expected_value": 1
             },
             {
-                "variable": 6,
+                "variable": 3,
                 "expected_value": 0
             },
             {
-                "variable": 6,
-                "expected_value": 0
+                "variable": 8,
+                "expected_value": 1
             }
         ]
     ],
     "red_clauses": [
         [
             {
-                "variable": 6,
+                "variable": 1,
+                "expected_value": 0
+            },
+            {
+                "variable": 7,
                 "expected_value": 1
             },
             {
                 "variable": 1,
-                "expected_value": 1
-            },
-            {
-                "variable": 7,
                 "expected_value": 0
             }
         ],
         [
+            {
+                "variable": 6,
+                "expected_value": 1
+            },
+            {
+                "variable": 5,
+                "expected_value": 1
+            },
             {
                 "variable": 2,
-                "expected_value": 1
-            },
-            {
-                "variable": 3,
-                "expected_value": 0
-            },
-            {
-                "variable": 3,
                 "expected_value": 0
             }
         ],
         [
             {
-                "variable": 7,
-                "expected_value": 0
-            },
-            {
                 "variable": 4,
                 "expected_value": 0
             },
             {
-                "variable": 4,
+                "variable": 3,
                 "expected_value": 1
+            },
+            {
+                "variable": 2,
+                "expected_value": 0
             }
         ],
         [
@@ -171,41 +171,41 @@
                 "expected_value": 1
             },
             {
-                "variable": 3,
+                "variable": 1,
                 "expected_value": 0
             },
             {
-                "variable": 3,
-                "expected_value": 0
+                "variable": 4,
+                "expected_value": 1
             }
         ]
     ],
     "red_max_disjoint_clauses": [
         [
             {
+                "variable": 1,
+                "expected_value": 0
+            },
+            {
                 "variable": 7,
-                "expected_value": 0
-            },
-            {
-                "variable": 4,
-                "expected_value": 0
-            },
-            {
-                "variable": 4,
                 "expected_value": 1
+            },
+            {
+                "variable": 1,
+                "expected_value": 0
             }
         ],
         [
             {
-                "variable": 5,
-                "expected_value": 1
-            },
-            {
-                "variable": 3,
+                "variable": 4,
                 "expected_value": 0
             },
             {
                 "variable": 3,
+                "expected_value": 1
+            },
+            {
+                "variable": 2,
                 "expected_value": 0
             }
         ]
@@ -217,34 +217,43 @@
                 "expected_value": 1
             },
             {
-                "variable": 1,
+                "variable": 5,
                 "expected_value": 1
             },
             {
-                "variable": 7,
+                "variable": 2,
                 "expected_value": 0
             }
         ],
         [
             {
-                "variable": 2,
+                "variable": 5,
                 "expected_value": 1
             },
             {
-                "variable": 3,
+                "variable": 1,
                 "expected_value": 0
             },
             {
-                "variable": 3,
-                "expected_value": 0
+                "variable": 4,
+                "expected_value": 1
             }
         ]
     ],
     "red_solutions": [
         [
             1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1
+        ],
+        [
             1,
             1,
+            0,
             0,
             1,
             0,
@@ -255,25 +264,7 @@
             1,
             1,
             1,
-            1,
             0,
-            1
-        ],
-        [
-            0,
-            1,
-            1,
-            0,
-            1,
-            1,
-            1
-        ],
-        [
-            0,
-            1,
-            1,
-            1,
-            1,
             1,
             1
         ]
@@ -281,31 +272,30 @@
     "variables_unused": [
         1,
         2,
+        4,
         5,
-        11,
-        12
+        10
     ],
     "red_variables_uncovered": [
-        1,
-        2,
+        5,
         6
     ],
     "var_to_reduced": {
-        "4": 2,
-        "6": 3,
-        "7": 4,
-        "10": 7,
-        "9": 6,
-        "8": 5,
+        "6": 2,
+        "7": 3,
+        "11": 6,
+        "9": 5,
+        "12": 7,
+        "8": 4,
         "3": 1
     },
     "reduced_to_var": {
-        "5": 8,
-        "4": 7,
-        "6": 9,
-        "7": 10,
-        "2": 4,
-        "3": 6,
+        "5": 9,
+        "4": 8,
+        "6": 11,
+        "7": 12,
+        "2": 6,
+        "3": 7,
         "1": 3
     }
 }

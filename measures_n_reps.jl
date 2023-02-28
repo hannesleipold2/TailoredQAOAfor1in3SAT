@@ -7,10 +7,27 @@ function calc_sol_support(sol_vecs::Array{Array{Complex{Float64},1},1}, wave_fun
 	return sol_support
 end
 
-function calc_sol_support(sol_vecs::Array{Array{Complex{Float64},1},1}, wave_func::SparseVector{Complex{Float64}, Int64})
+function calc_sol_support(sol_vecs::Array{Array{Complex{Float64},1},1}, wave_func::SparseVector{Complex{Float64}})
 	sol_support = 0.0
 	for i = 1 : length(sol_vecs)
 		sol_support += abs(dot(sol_vecs[ i ], wave_func / norm(wave_func))) ^ 2
+	end
+	return sol_support
+end
+
+function calc_sol_support(sol_vecs::Array{Int64,1}, wave_func::Array{Complex{Float64}, 1})
+	sol_support = 0.0
+	for i = 1 : length(sol_vecs)
+		sol_support += abs(wave_func[ sol_vecs[ i ] ] / norm(wave_func)) ^ 2
+	end
+	return sol_support
+end
+
+
+function calc_sol_support(sol_vecs::Array{Int64,1}, wave_func::SparseVector{Complex{Float64}, Int64})
+	sol_support = 0.0
+	for i = 1 : length(sol_vecs)
+		sol_support += abs(wave_func[ sol_vecs[ i ] ] / norm(wave_func)) ^ 2
 	end
 	return sol_support
 end

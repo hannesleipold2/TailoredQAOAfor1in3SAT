@@ -123,7 +123,7 @@ We benchmark `QAOA1` and our approach with $p=14$ and $p=60$, following `B&M`, f
 
 Our $p=14$ results show strong performance from both approaches and a soft decay for larger size $n$. In this plot, we label `QAOA1` as `green` and our tailored approach (`tQAOA`) as `blue`. We see a significant uplift from the tailoring!
 
-![img](./plots/plot_succ_vs_nbits_pdepth=14.png)
+![plot_pdepth14](./plots/plot_succ_vs_nbits_pdepth=14_small.png)
 
 Fitting an exponential curve on the data with `CurveFit.jl` shows `QAOA` grows as $e^{0.11}$ while `tQAOA` grows as $e^{0.11}$.
 
@@ -131,7 +131,7 @@ Fitting an exponential curve on the data with `CurveFit.jl` shows `QAOA` grows a
 
 Our $p=60$ results show expected s tronger performance from both approaches over $p=14$. In this plot, we label `QAOA1` as `green` and our tailored approach (`tQAOA`) as `blue`. We see a significant uplift from the tailoring!
 
-![img2](./plots/plot_succ_vs_nbits_pdepth=60.png)
+![plot_pdepth14](./plots/plot_succ_vs_nbits_pdepth=60_small.png)
 
 Fitting an exponential curve on the data shows `QAOA` grows as $e^{0.11}$ while `tQAOA` grows as $e^{0.11}$.
 
@@ -140,7 +140,7 @@ Fitting an exponential curve on the data shows `QAOA` grows as $e^{0.11}$ while 
 
 We expect an important contribution to the improved runtime of our approach is due to the smaller search space. Here we show a plot of how the search space grows for both approaches.
 
-
+![plot_size](./plots/plot_succ_vs_nbits_pdepth=60_small.png)
 
 Fitting an exponential curve on the data shows `QAOA` grows as $e^{0.11}$ while `tQAOA` grows as $e^{0.11}$.
 
